@@ -12,193 +12,309 @@ using JSONAPI.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using JSONAPI.Payload;
 using Moq;
+using IErrorSerializer = JSONAPI.Json.IErrorSerializer;
 
 namespace JSONAPI.Tests.Json
 {
     [TestClass]
     public class JsonApiMediaFormatterTests
     {
-        Author a;
-        Post p, p2, p3, p4;
-        Sample s1, s2;
-        Tag t1, t2, t3;
-
-        private class MockErrorSerializer : IErrorSerializer
+        [TestMethod]
+        public void CanWriteType_returns_true_for_SingleResourcePayload()
         {
-            public bool CanSerialize(Type type)
-            {
-                return true;
-            }
+            // Arrange
+            var formatter = new JsonApiFormatter(null, null, null);
 
-            public void SerializeError(object error, Stream writeStream, JsonWriter writer, JsonSerializer serializer)
-            {
-                writer.WriteStartObject();
-                writer.WritePropertyName("test");
-                serializer.Serialize(writer, "foo");
-                writer.WriteEndObject();
-            }
+            // Act
+            var canWriteType = formatter.CanWriteType(typeof (SingleResourcePayload));
+
+            // Assert
+            canWriteType.Should().BeTrue();
         }
 
-        private class NonStandardIdThing
+        [TestMethod]
+        public void CanWriteType_returns_true_for_ResourceCollectionPayload()
         {
-            [JSONAPI.Attributes.UseAsId]
-            public Guid Uuid { get; set; }
-            public string Data { get; set; }
+            // Arrange
+            var formatter = new JsonApiFormatter(null, null, null);
+
+            // Act
+            var canWriteType = formatter.CanWriteType(typeof(ResourceCollectionPayload));
+
+            // Assert
+            canWriteType.Should().BeTrue();
         }
 
-        [TestInitialize]
-        public void SetupModels()
+        [TestMethod]
+        public void CanWriteType_returns_true_for_ErrorPayload()
         {
-            a = new Author
-            {
-                Id = 1,
-                Name = "Jason Hater",
-            };
+            // Arrange
+            var formatter = new JsonApiFormatter(null, null, null);
 
-            t1 = new Tag 
-            {
-                Id = 1,
-                Text = "Ember"
-            };
-            t2 = new Tag 
-            {
-                Id = 2,
-                Text = "React"
-            };
-            t3 = new Tag 
-            {
-                Id = 3,
-                Text = "Angular"
-            };
+            // Act
+            var canWriteType = formatter.CanWriteType(typeof(ErrorPayload));
 
-            p = new Post()
-            {
-                Id = 1,
-                Title = "Linkbait!",
-                Author = a
-            };
-            p2 = new Post
-            {
-                Id = 2,
-                Title = "Rant #1023",
-                Author = a
-            };
-            p3 = new Post
-            {
-                Id = 3,
-                Title = "Polemic in E-flat minor #824",
-                Author = a
-            };
-            p4 = new Post
-            {
-                Id = 4,
-                Title = "This post has no author."
-            };
-
-            a.Posts = new List<Post> { p, p2, p3 };
-
-            p.Comments = new List<Comment>() {
-                new Comment() {
-                    Id = 2,
-                    Body = "Nuh uh!",
-                    Post = p
-                },
-                new Comment() {
-                    Id = 3,
-                    Body = "Yeah huh!",
-                    Post = p
-                },
-                new Comment() {
-                    Id = 4,
-                    Body = "Third Reich.",
-                    Post = p,
-                    CustomData = "{ \"foo\": \"bar\" }"
-                }
-            };
-            p2.Comments = new List<Comment> {
-                new Comment {
-                    Id = 5,
-                    Body = "I laughed, I cried!",
-                    Post = p2
-                }
-            };
-
-            s1 = new Sample
-            {
-                Id = "1",
-                BooleanField = false,
-                NullableBooleanField = false,
-                SByteField = default(SByte),
-                NullableSByteField = null,
-                ByteField = default(Byte),
-                NullableByteField = null,
-                Int16Field = default(Int16),
-                NullableInt16Field = null,
-                UInt16Field = default(UInt16),
-                NullableUInt16Field = null,
-                Int32Field = default(Int32),
-                NullableInt32Field = null,
-                UInt32Field = default(Int32),
-                NullableUInt32Field = null,
-                Int64Field = default(Int64),
-                NullableInt64Field = null,
-                UInt64Field = default(UInt64),
-                NullableUInt64Field = null,
-                DoubleField = default(Double),
-                NullableDoubleField = null,
-                SingleField = default(Single),
-                NullableSingleField = null,
-                DecimalField = default(Decimal),
-                NullableDecimalField = null,
-                DateTimeField = default(DateTime),
-                NullableDateTimeField = null,
-                DateTimeOffsetField = default(DateTimeOffset),
-                NullableDateTimeOffsetField = null,
-                GuidField = default(Guid),
-                NullableGuidField = null,
-                StringField = default(String),
-                EnumField = default(SampleEnum),
-                NullableEnumField = null,
-            };
-            s2 = new Sample
-            {
-                Id = "2",
-                BooleanField = true,
-                NullableBooleanField = true,
-                SByteField = 123,
-                NullableSByteField = 123,
-                ByteField = 253,
-                NullableByteField = 253,
-                Int16Field = 32000,
-                NullableInt16Field = 32000,
-                UInt16Field = 64000,
-                NullableUInt16Field = 64000,
-                Int32Field = 2000000000,
-                NullableInt32Field = 2000000000,
-                UInt32Field = 3000000000,
-                NullableUInt32Field = 3000000000,
-                Int64Field = 9223372036854775807,
-                NullableInt64Field = 9223372036854775807,
-                UInt64Field = 9223372036854775808,
-                NullableUInt64Field = 9223372036854775808,
-                DoubleField = 1056789.123,
-                NullableDoubleField = 1056789.123,
-                SingleField = 1056789.123f,
-                NullableSingleField = 1056789.123f,
-                DecimalField = 1056789.123m,
-                NullableDecimalField = 1056789.123m,
-                DateTimeField = new DateTime(1776, 07, 04),
-                NullableDateTimeField = new DateTime(1776, 07, 04),
-                DateTimeOffsetField = new DateTimeOffset(new DateTime(1776, 07, 04), new TimeSpan(-5, 0, 0)),
-                NullableDateTimeOffsetField = new DateTimeOffset(new DateTime(1776, 07, 04), new TimeSpan(-5, 0, 0)),
-                GuidField = new Guid("6566F9B4-5245-40DE-890D-98B40A4AD656"),
-                NullableGuidField = new Guid("3D1FB81E-43EE-4D04-AF91-C8A326341293"),
-                StringField = "Some string 156",
-                EnumField = SampleEnum.Value1,
-                NullableEnumField = SampleEnum.Value2,
-            };
+            // Assert
+            canWriteType.Should().BeTrue();
         }
+
+        [TestMethod]
+        public void Serialize_SingleResourcePayload()
+        {
+            // Arrange
+            var payload = new Mock<ISingleResourcePayload>(MockBehavior.Strict);
+            var singleResourcePayloadSerializer = new Mock<ISingleResourcePayloadSerializer>(MockBehavior.Strict);
+            singleResourcePayloadSerializer.Setup(s => s.Serialize(payload.Object, It.IsAny<JsonWriter>()))
+                .Returns((ISingleResourcePayload p, JsonWriter writer) =>
+                {
+                    writer.WriteValue("SingleResourcePayload output goes here.");
+                    return Task.FromResult(0);
+                });
+            var resourceCollectionPayloadSerializer = new Mock<IResourceCollectionPayloadSerializer>(MockBehavior.Strict);
+            var errorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer.Object, resourceCollectionPayloadSerializer.Object, errorPayloadSerializer.Object);
+            var stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
+
+            // Assert
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_SingleResourcePayload.json");
+        }
+
+        [TestMethod]
+        public void Serialize_ResourceCollectionPayload()
+        {
+            // Arrange
+            var payload = new Mock<IResourceCollectionPayload>(MockBehavior.Strict);
+            var singleResourcePayloadSerializer = new Mock<ISingleResourcePayloadSerializer>(MockBehavior.Strict);
+            var resourceCollectionPayloadSerializer = new Mock<IResourceCollectionPayloadSerializer>(MockBehavior.Strict);
+            resourceCollectionPayloadSerializer.Setup(s => s.Serialize(payload.Object, It.IsAny<JsonWriter>()))
+                .Returns((IResourceCollectionPayload p, JsonWriter writer) =>
+                {
+                    writer.WriteValue("ResourceCollectionPayload output goes here.");
+                    return Task.FromResult(0);
+                });
+            var errorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer.Object, resourceCollectionPayloadSerializer.Object, errorPayloadSerializer.Object);
+            var stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
+
+            // Assert
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_ResourceCollectionPayload.json");
+        }
+
+        [TestMethod]
+        public void Serialize_ErrorPayload()
+        {
+            // Arrange
+            var payload = new Mock<IErrorPayload>(MockBehavior.Strict);
+            var singleResourcePayloadSerializer = new Mock<ISingleResourcePayloadSerializer>(MockBehavior.Strict);
+            var resourceCollectionPayloadSerializer = new Mock<IResourceCollectionPayloadSerializer>(MockBehavior.Strict);
+            var errorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+            errorPayloadSerializer.Setup(s => s.Serialize(payload.Object, It.IsAny<JsonWriter>()))
+                .Returns((IErrorPayload p, JsonWriter writer) =>
+                {
+                    writer.WriteValue("ErrorPayload output goes here.");
+                    return Task.FromResult(0);
+                });
+
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer.Object, resourceCollectionPayloadSerializer.Object, errorPayloadSerializer.Object);
+            var stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
+
+            // Assert
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_ErrorPayload.json");
+        }
+
+        //Author a;
+        //Post p, p2, p3, p4;
+        //Sample s1, s2;
+        //Tag t1, t2, t3;
+
+        //private class MockErrorSerializer : IErrorSerializer
+        //{
+        //    public bool CanSerialize(Type type)
+        //    {
+        //        return true;
+        //    }
+
+        //    public void SerializeError(object error, Stream writeStream, JsonWriter writer, JsonSerializer serializer)
+        //    {
+        //        writer.WriteStartObject();
+        //        writer.WritePropertyName("test");
+        //        serializer.Serialize(writer, "foo");
+        //        writer.WriteEndObject();
+        //    }
+        //}
+
+        //private class NonStandardIdThing
+        //{
+        //    [JSONAPI.Attributes.UseAsId]
+        //    public Guid Uuid { get; set; }
+        //    public string Data { get; set; }
+        //}
+
+        //[TestInitialize]
+        //public void SetupModels()
+        //{
+        //    a = new Author
+        //    {
+        //        Id = 1,
+        //        Name = "Jason Hater",
+        //    };
+
+        //    t1 = new Tag 
+        //    {
+        //        Id = 1,
+        //        Text = "Ember"
+        //    };
+        //    t2 = new Tag 
+        //    {
+        //        Id = 2,
+        //        Text = "React"
+        //    };
+        //    t3 = new Tag 
+        //    {
+        //        Id = 3,
+        //        Text = "Angular"
+        //    };
+
+        //    p = new Post()
+        //    {
+        //        Id = 1,
+        //        Title = "Linkbait!",
+        //        Author = a
+        //    };
+        //    p2 = new Post
+        //    {
+        //        Id = 2,
+        //        Title = "Rant #1023",
+        //        Author = a
+        //    };
+        //    p3 = new Post
+        //    {
+        //        Id = 3,
+        //        Title = "Polemic in E-flat minor #824",
+        //        Author = a
+        //    };
+        //    p4 = new Post
+        //    {
+        //        Id = 4,
+        //        Title = "This post has no author."
+        //    };
+
+        //    a.Posts = new List<Post> { p, p2, p3 };
+
+        //    p.Comments = new List<Comment>() {
+        //        new Comment() {
+        //            Id = 2,
+        //            Body = "Nuh uh!",
+        //            Post = p
+        //        },
+        //        new Comment() {
+        //            Id = 3,
+        //            Body = "Yeah huh!",
+        //            Post = p
+        //        },
+        //        new Comment() {
+        //            Id = 4,
+        //            Body = "Third Reich.",
+        //            Post = p,
+        //            CustomData = "{ \"foo\": \"bar\" }"
+        //        }
+        //    };
+        //    p2.Comments = new List<Comment> {
+        //        new Comment {
+        //            Id = 5,
+        //            Body = "I laughed, I cried!",
+        //            Post = p2
+        //        }
+        //    };
+
+        //    s1 = new Sample
+        //    {
+        //        Id = "1",
+        //        BooleanField = false,
+        //        NullableBooleanField = false,
+        //        SByteField = default(SByte),
+        //        NullableSByteField = null,
+        //        ByteField = default(Byte),
+        //        NullableByteField = null,
+        //        Int16Field = default(Int16),
+        //        NullableInt16Field = null,
+        //        UInt16Field = default(UInt16),
+        //        NullableUInt16Field = null,
+        //        Int32Field = default(Int32),
+        //        NullableInt32Field = null,
+        //        UInt32Field = default(Int32),
+        //        NullableUInt32Field = null,
+        //        Int64Field = default(Int64),
+        //        NullableInt64Field = null,
+        //        UInt64Field = default(UInt64),
+        //        NullableUInt64Field = null,
+        //        DoubleField = default(Double),
+        //        NullableDoubleField = null,
+        //        SingleField = default(Single),
+        //        NullableSingleField = null,
+        //        DecimalField = default(Decimal),
+        //        NullableDecimalField = null,
+        //        DateTimeField = default(DateTime),
+        //        NullableDateTimeField = null,
+        //        DateTimeOffsetField = default(DateTimeOffset),
+        //        NullableDateTimeOffsetField = null,
+        //        GuidField = default(Guid),
+        //        NullableGuidField = null,
+        //        StringField = default(String),
+        //        EnumField = default(SampleEnum),
+        //        NullableEnumField = null,
+        //    };
+        //    s2 = new Sample
+        //    {
+        //        Id = "2",
+        //        BooleanField = true,
+        //        NullableBooleanField = true,
+        //        SByteField = 123,
+        //        NullableSByteField = 123,
+        //        ByteField = 253,
+        //        NullableByteField = 253,
+        //        Int16Field = 32000,
+        //        NullableInt16Field = 32000,
+        //        UInt16Field = 64000,
+        //        NullableUInt16Field = 64000,
+        //        Int32Field = 2000000000,
+        //        NullableInt32Field = 2000000000,
+        //        UInt32Field = 3000000000,
+        //        NullableUInt32Field = 3000000000,
+        //        Int64Field = 9223372036854775807,
+        //        NullableInt64Field = 9223372036854775807,
+        //        UInt64Field = 9223372036854775808,
+        //        NullableUInt64Field = 9223372036854775808,
+        //        DoubleField = 1056789.123,
+        //        NullableDoubleField = 1056789.123,
+        //        SingleField = 1056789.123f,
+        //        NullableSingleField = 1056789.123f,
+        //        DecimalField = 1056789.123m,
+        //        NullableDecimalField = 1056789.123m,
+        //        DateTimeField = new DateTime(1776, 07, 04),
+        //        NullableDateTimeField = new DateTime(1776, 07, 04),
+        //        DateTimeOffsetField = new DateTimeOffset(new DateTime(1776, 07, 04), new TimeSpan(-5, 0, 0)),
+        //        NullableDateTimeOffsetField = new DateTimeOffset(new DateTime(1776, 07, 04), new TimeSpan(-5, 0, 0)),
+        //        GuidField = new Guid("6566F9B4-5245-40DE-890D-98B40A4AD656"),
+        //        NullableGuidField = new Guid("3D1FB81E-43EE-4D04-AF91-C8A326341293"),
+        //        StringField = "Some string 156",
+        //        EnumField = SampleEnum.Value1,
+        //        NullableEnumField = SampleEnum.Value2,
+        //    };
+        //}
 
         [Ignore]
         [TestMethod]

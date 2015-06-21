@@ -164,6 +164,9 @@
     <None Include="Data\SerializerIntegrationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Json\Fixtures\Serialize_SingleResourcePayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\Serialize_ResourceCollectionPayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\Serialize_ErrorPayload.json" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_only.json" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_and_metadata.json" />
