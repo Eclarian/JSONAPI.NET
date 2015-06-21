@@ -125,9 +125,11 @@
     <Compile Include="Payload\IResourceLinkageSerializer.cs" />
     <Compile Include="Payload\IResourceObject.cs" />
     <Compile Include="Payload\IResourceObjectSerializer.cs" />
+    <Compile Include="Payload\ISingleResourcePayloadBuilder.cs" />
     <Compile Include="Payload\ISingleResourcePayload.cs" />
     <Compile Include="Payload\ISingleResourcePayloadSerializer.cs" />
     <Compile Include="Payload\LinkSerializer.cs" />
+    <Compile Include="Payload\ManagedModelSingleResourcePayloadBuilder.cs" />
     <Compile Include="Payload\MetadataSerializer.cs" />
     <Compile Include="Payload\RelationshipObject.cs" />
     <Compile Include="Payload\RelationshipObjectSerializer.cs" />
