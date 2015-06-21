@@ -1,0 +1,17 @@
+﻿{
+    "data": {
+        "type": "cities",
+        "id": "9001",
+        "attributes": {
+            "name": "Tacoma"
+        },
+        "relationships": {
+            "state": {
+                "data": null,
+                "links": { 
+                    "related": "/cities/9001/state"
+                }
+            }
+        }
+    }
+}

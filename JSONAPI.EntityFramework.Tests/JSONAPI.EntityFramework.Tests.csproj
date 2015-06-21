@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
+    <Compile Include="Acceptance\LinkSerializationTests.cs" />
     <Compile Include="Acceptance\PayloadTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
     <Compile Include="Acceptance\PostsTests.cs" />
@@ -177,6 +178,8 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\GetReturnsIPayloadResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\LinkSerialization\Responses\GetResourceWithRelatedLinkAndMissingToOneRelationshipResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\LinkSerialization\Responses\GetResourceWithRelatedLinkAndPresentToOneRelationshipResponse.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

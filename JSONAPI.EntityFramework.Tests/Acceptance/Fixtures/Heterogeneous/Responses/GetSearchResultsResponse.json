@@ -40,7 +40,7 @@
             "relationships": {
                 "post": {
                     "data": {
-                        "type":  "posts",
+                        "type": "posts",
                         "id": "201"
                     }
                 },
@@ -50,6 +50,16 @@
                         "id": "403"
                     }
                 }
+            }
+        }
+    ],
+    "included": [
+        {
+            "type": "users",
+            "id": "401",
+            "attributes": {
+                "firstName": "Alice",
+                "lastName": "Smith"
             }
         }
     ]

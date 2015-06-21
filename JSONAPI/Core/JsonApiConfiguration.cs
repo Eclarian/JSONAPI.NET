@@ -61,16 +61,17 @@ namespace JSONAPI.Core
         /// <param name="httpConfig">The HttpConfiguration to apply this JsonApiConfiguration to</param>
         public void Apply(HttpConfiguration httpConfig)
         {
-            var formatter = new JsonApiFormatter(_modelManager);
+            throw new NotImplementedException();
+            //var formatter = new JsonApiFormatter();
 
-            httpConfig.Formatters.Clear();
-            httpConfig.Formatters.Add(formatter);
+            //httpConfig.Formatters.Clear();
+            //httpConfig.Formatters.Add(formatter);
 
-            var queryablePayloadBuilder = _payloadBuilderFactory();
-            httpConfig.Filters.Add(new JsonApiQueryableAttribute(queryablePayloadBuilder));
+            //var queryablePayloadBuilder = _payloadBuilderFactory();
+            //httpConfig.Filters.Add(new JsonApiQueryableAttribute(queryablePayloadBuilder));
 
-            httpConfig.Services.Replace(typeof (IHttpControllerSelector),
-                new PascalizedControllerSelector(httpConfig));
+            //httpConfig.Services.Replace(typeof (IHttpControllerSelector),
+            //    new PascalizedControllerSelector(httpConfig));
         }
     }
 }

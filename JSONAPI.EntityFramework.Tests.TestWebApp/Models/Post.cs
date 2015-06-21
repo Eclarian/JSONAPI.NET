@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using JSONAPI.Attributes;
 using Newtonsoft.Json;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
@@ -21,10 +22,13 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public string AuthorId { get; set; }
 
         [ForeignKey("AuthorId")]
+        [IncludeInPayload(true)]
         public virtual User Author { get; set; }
 
+        [IncludeInPayload(true)]
         public virtual ICollection<Comment> Comments { get; set; }
 
+        [IncludeInPayload(true)]
         public virtual ICollection<Tag> Tags { get; set; }
     }
 }

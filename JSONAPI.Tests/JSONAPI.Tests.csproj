@@ -96,7 +96,20 @@
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
+    <Compile Include="Payload\JsonApiSerializerTestsBase.cs" />
+    <Compile Include="Payload\ErrorSerializerTests.cs" />
+    <Compile Include="Payload\ResourceLinkageSerializerTests.cs" />
+    <Compile Include="Payload\MetadataSerializerTests.cs" />
+    <Compile Include="Payload\RelationshipObjectSerializerTests.cs" />
+    <Compile Include="Payload\LinkSerializerTests.cs" />
+    <Compile Include="Payload\ResourceObjectSerializerTests.cs" />
+    <Compile Include="Payload\ErrorPayloadSerializerTests.cs" />
+    <Compile Include="Payload\ResourceCollectionPayloadSerializerTests.cs" />
+    <Compile Include="Payload\SingleResourcePayloadSerializerTests.cs" />
+    <Compile Include="Payload\ToManyResourceLinkageTests.cs" />
+    <Compile Include="Payload\ToOneResourceLinkageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSONAPI\JSONAPI.csproj">
@@ -152,7 +165,36 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_and_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_without_attributes.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_attributes.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_relationships.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_only_null_relationships.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_links.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_all_possible_members.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_link_without_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_link_with_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_meta_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_self_link_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_related_link_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_self_link_and_related_link.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_linkage_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_relationship_with_all_possible_members.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ToOneResourceLinkage.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_linkage.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_null_linkage.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_error_with_all_possible_members.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_error_with_only_id.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ErrorPayload.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_all_possible_members.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_all_possible_members.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_primary_data_only_and_metadata.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_primary_data_only.json" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

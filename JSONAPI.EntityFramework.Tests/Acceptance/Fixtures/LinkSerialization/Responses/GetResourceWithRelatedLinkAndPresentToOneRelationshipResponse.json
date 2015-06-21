@@ -1,0 +1,20 @@
+﻿{
+    "data": {
+        "type": "cities",
+        "id": "9000",
+        "attributes": {
+            "name": "Seattle"
+        },
+        "relationships": {
+            "state": {
+                "data": {
+                    "type": "states",
+                    "id": "4000"
+                },
+                "links": { 
+                    "related": "/cities/9000/state"
+                }
+            }
+        }
+    }
+}

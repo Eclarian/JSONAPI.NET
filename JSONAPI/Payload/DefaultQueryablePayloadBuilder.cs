@@ -36,7 +36,7 @@ namespace JSONAPI.Payload
             _paginationTransformer = paginationTransformer;
         }
 
-        public async Task<IPayload> BuildPayload<T>(IQueryable<T> query, HttpRequestMessage request, CancellationToken cancellationToken)
+        public async Task<IResourceCollectionPayload> BuildPayload<T>(IQueryable<T> query, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (_filteringTransformer != null)
                 query = _filteringTransformer.Filter(query, request);
@@ -52,10 +52,11 @@ namespace JSONAPI.Payload
 
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
 
-            return new Payload
-            {
-                PrimaryData = results
-            };
+            throw new NotImplementedException();
+            //return new Payload
+            //{
+            //    PrimaryData = results
+            //};
         }
     }
 }

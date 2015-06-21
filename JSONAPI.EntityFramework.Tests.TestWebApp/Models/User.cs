@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using JSONAPI.Attributes;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 {
@@ -16,6 +17,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 
         public virtual ICollection<Post> Posts { get; set; }
 
+        [IncludeInPayload(true)]
         public virtual ICollection<UserGroup> UserGroups { get; set; }
     }
 }
