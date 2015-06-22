@@ -229,20 +229,18 @@ namespace JSONAPI.Core
             if (prop.PropertyType.CanWriteAsJsonApiAttribute())
                 return new FieldModelProperty(prop, jsonKey, ignoreByDefault);
 
+            var selfLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelationshipLinkTemplate>().FirstOrDefault();
+            var selfLinkTemplate = selfLinkTemplateAttribute == null ? null : selfLinkTemplateAttribute.TemplateString;
+            var relatedResourceLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelatedResourceLinkTemplate>().FirstOrDefault();
+            var relatedResourceLinkTemplate = relatedResourceLinkTemplateAttribute == null ? null : relatedResourceLinkTemplateAttribute.TemplateString;
+
             var isToMany =
                 type.IsArray ||
                 (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
 
-            Type relatedType;
-            if (isToMany)
-            {
-                relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
-            }
-            else
-            {
-                relatedType = type;
-            }
-            return new ToManyRelationshipModelProperty(prop, jsonKey, ignoreByDefault, relatedType, null, null);
+            if (!isToMany) return new ToOneRelationshipModelProperty(prop, jsonKey, ignoreByDefault, type, selfLinkTemplate, relatedResourceLinkTemplate);
+            var relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
+            return new ToManyRelationshipModelProperty(prop, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
         }
 
         /// <summary>

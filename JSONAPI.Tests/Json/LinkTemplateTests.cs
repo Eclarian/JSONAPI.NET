@@ -18,7 +18,7 @@ namespace JSONAPI.Tests.Json
             public string Title { get; set; }
 
             [SerializeAs(SerializeAsOptions.RelatedLink)]
-            [LinkTemplate("/users/{0}")]
+            [RelatedResourceLinkTemplate("/users/{0}")]
             public virtual User Author { get; set; }
         }
 

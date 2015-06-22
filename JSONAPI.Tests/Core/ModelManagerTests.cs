@@ -307,23 +307,31 @@ namespace JSONAPI.Tests.Core
             // Arrange
             var pluralizationService = new PluralizationService();
             var mm = new ModelManager(pluralizationService);
-            Type authorType = typeof(Author);
+            Type authorType = typeof(Post);
             mm.RegisterResourceType(authorType);
 
             // Act
             var idProp = mm.GetPropertyForJsonKey(authorType, "id");
-            var nameProp = mm.GetPropertyForJsonKey(authorType, "name");
-            var postsProp = mm.GetPropertyForJsonKey(authorType, "posts");
+            var titleProp = mm.GetPropertyForJsonKey(authorType, "title");
+            var commentsProp = mm.GetPropertyForJsonKey(authorType, "comments");
+            var authorProp = mm.GetPropertyForJsonKey(authorType, "author");
 
             // Assert
             idProp.Property.Should().BeSameAs(authorType.GetProperty("Id"));
             idProp.Should().BeOfType<FieldModelProperty>();
 
-            nameProp.Property.Should().BeSameAs(authorType.GetProperty("Name"));
-            nameProp.Should().BeOfType<FieldModelProperty>();
+            titleProp.Property.Should().BeSameAs(authorType.GetProperty("Title"));
+            titleProp.Should().BeOfType<FieldModelProperty>();
 
-            postsProp.Property.Should().BeSameAs(authorType.GetProperty("Posts"));
-            postsProp.Should().BeOfType<ToManyRelationshipModelProperty>();
+            commentsProp.Property.Should().BeSameAs(authorType.GetProperty("Comments"));
+            commentsProp.Should().BeOfType<ToManyRelationshipModelProperty>();
+            ((ToManyRelationshipModelProperty) commentsProp).SelfLinkTemplate.Should().Be("/posts/{1}/relationships/comments");
+            ((ToManyRelationshipModelProperty) commentsProp).RelatedResourceLinkTemplate.Should().Be("/posts/{1}/comments");
+
+            authorProp.Property.Should().BeSameAs(authorType.GetProperty("Author"));
+            authorProp.Should().BeOfType<ToOneRelationshipModelProperty>();
+            ((ToOneRelationshipModelProperty)authorProp).SelfLinkTemplate.Should().Be(null);
+            ((ToOneRelationshipModelProperty)authorProp).RelatedResourceLinkTemplate.Should().Be(null);
         }
 
         [TestMethod]

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using JSONAPI.Attributes;
 using Newtonsoft.Json;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
@@ -27,7 +26,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public virtual Post Post { get; set; }
 
         [ForeignKey("AuthorId")]
-        [IncludeInPayload(true)]
         public virtual User Author { get; set; }
     }
 }

@@ -11,8 +11,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public string Name { get; set; }
 
         [SerializeAs(SerializeAsOptions.RelatedLink)]
-        [LinkTemplate("/cities/{1}/state")]
-        [IncludeInPayload(true)]
+        [RelatedResourceLinkTemplate("/cities/{1}/state")]
         public virtual State State { get; set; }
     }
 }

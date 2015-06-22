@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using JSONAPI.Attributes;
-using JSONAPI.Core;
+﻿using JSONAPI.Attributes;
 
 namespace JSONAPI.Tests.Models
 {
