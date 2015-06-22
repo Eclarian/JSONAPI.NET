@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JSONAPI.Core;
 using Newtonsoft.Json.Linq;
 
@@ -31,11 +32,49 @@ namespace JSONAPI.Payload
             var typeName = _modelManager.GetResourceTypeNameForType(primaryDataType);
 
             var attributes = new Dictionary<string, JToken>();
+            var relationships = new Dictionary<string, IRelationshipObject>();
+
+            var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
+
+            foreach (var modelProperty in _modelManager.GetProperties(primaryDataType))
+            {
+                if (modelProperty is FieldModelProperty)
+                {
+                    attributes[modelProperty.JsonKey] = JToken.FromObject(modelProperty.Property.GetValue(primaryData));
+                    continue;
+                }
+
+                var property = modelProperty as RelationshipModelProperty;
+                if (property != null)
+                {
+                    IResourceLinkage linkage;
+
+                    var relationshipModelProperty = property;
+                    if (relationshipModelProperty.IsToMany)
+                    {
+                        linkage = null;
+                    }
+                    else
+                    {
+                        var propertyValue = property.Property.GetValue(primaryData);
+                        var propertyValueType = propertyValue.GetType();
+                        var propertyValueTypeName = _modelManager.GetResourceTypeNameForType(propertyValueType);
+                        var propertyValueTypeIdProperty = _modelManager.GetIdProperty(propertyValueType);
+                        var propertyValueTypeId = propertyValueTypeIdProperty.GetValue(propertyValue).ToString();
+                        var identifier = new ResourceIdentifier(propertyValueTypeName, propertyValueTypeId);
+                        linkage = new ToOneResourceLinkage(identifier);
 
 
-            var primaryDataResource = new ResourceObject(typeName, resourceId, attributes);
+                    }
 
-            var payload = new SingleResourcePayload(primaryDataResource, null, null);
+                    relationships[property.JsonKey] = new RelationshipObject(linkage);
+                }
+            }
+
+            var primaryDataResource = new ResourceObject(typeName, resourceId, attributes, relationships);
+
+            var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
+            var payload = new SingleResourcePayload(primaryDataResource, relatedData, null);
             return payload;
         }
     }
