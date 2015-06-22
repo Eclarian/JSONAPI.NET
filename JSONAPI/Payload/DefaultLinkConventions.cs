@@ -19,34 +19,50 @@ namespace JSONAPI.Payload
             _baseUrl = baseUrl;
         }
 
-        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, RelationshipModelProperty property)
+        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IModelManager modelManager, RelationshipModelProperty property)
         {
-            var url = BuildRelationshipUrl(relationshipOwner, property);
+            var url = BuildRelationshipUrl(relationshipOwner, modelManager, property);
             var metadata = GetMetadataForRelationshipLink(relationshipOwner, property);
             return new Link(url, metadata);
         }
 
-        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, RelationshipModelProperty property)
+        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IModelManager modelManager, RelationshipModelProperty property)
         {
-            var url = BuildRelatedResourceUrl(relationshipOwner, property);
+            var url = BuildRelatedResourceUrl(relationshipOwner, modelManager, property);
             var metadata = GetMetadataForRelatedResourceLink(relationshipOwner, property);
             return new Link(url, metadata);
+        }
+
+        private string GetSanitizedBaseUrl()
+        {
+            var sanitizedBaseUrl = _baseUrl;
+            while (sanitizedBaseUrl[sanitizedBaseUrl.Length - 1] == '/')
+                sanitizedBaseUrl = _baseUrl.Substring(0, _baseUrl.Length - 1);
+            return sanitizedBaseUrl;
         }
 
         /// <summary>
         /// Constructs a URL for the relationship belonging to the given resource
         /// </summary>
         /// <param name="relationshipOwner"></param>
+        /// <param name="modelManager"></param>
         /// <param name="property"></param>
         /// <typeparam name="TResource"></typeparam>
         /// <returns></returns>
-        protected virtual string BuildRelationshipUrl<TResource>(TResource relationshipOwner,
+        protected virtual string BuildRelationshipUrl<TResource>(TResource relationshipOwner, IModelManager modelManager,
             RelationshipModelProperty property)
         {
-            var strippedBaseUrl = _baseUrl;
-            while (strippedBaseUrl[strippedBaseUrl.Length - 1] == '/')
-                strippedBaseUrl = _baseUrl.Substring(0, _baseUrl.Length - 2);
-            return String.Format("{0}/{1}/{2}/relationships/{3}", strippedBaseUrl, "countries", "45", property.JsonKey);
+            var sanitizedBaseUrl = GetSanitizedBaseUrl();
+            var idProp = modelManager.GetIdProperty(typeof(TResource));
+            var idPropValue = idProp.GetValue(relationshipOwner).ToString();
+            if (property.SelfLinkTemplate != null)
+            {
+                var replacedString = property.SelfLinkTemplate.Replace("{1}", idPropValue);
+                return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
+            }
+
+            var resourceTypeName = modelManager.GetResourceTypeNameForType(typeof(TResource));
+            return String.Format("{0}/{1}/{2}/relationships/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
         }
 
         /// <summary>
@@ -62,16 +78,24 @@ namespace JSONAPI.Payload
         /// Constructs a URL for the resource(s) on the other side of the given relationship, belonging to the given resource
         /// </summary>
         /// <param name="relationshipOwner"></param>
+        /// <param name="modelManager"></param>
         /// <param name="property"></param>
         /// <typeparam name="TResource"></typeparam>
         /// <returns></returns>
-        protected virtual string BuildRelatedResourceUrl<TResource>(TResource relationshipOwner,
+        protected virtual string BuildRelatedResourceUrl<TResource>(TResource relationshipOwner, IModelManager modelManager,
             RelationshipModelProperty property)
         {
-            var strippedBaseUrl = _baseUrl;
-            while (strippedBaseUrl[strippedBaseUrl.Length - 1] == '/')
-                strippedBaseUrl = _baseUrl.Substring(0, _baseUrl.Length - 2);
-            return String.Format("{0}/{1}/{2}/{3}", strippedBaseUrl, "countries", "45", property.JsonKey);
+            var sanitizedBaseUrl = GetSanitizedBaseUrl();
+            var idProp = modelManager.GetIdProperty(typeof(TResource));
+            var idPropValue = idProp.GetValue(relationshipOwner).ToString();
+            if (property.RelatedResourceLinkTemplate != null)
+            {
+                var replacedString = property.RelatedResourceLinkTemplate.Replace("{1}", idPropValue);
+                return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
+            }
+
+            var resourceTypeName = modelManager.GetResourceTypeNameForType(typeof(TResource));
+            return String.Format("{0}/{1}/{2}/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
         }
 
         /// <summary>

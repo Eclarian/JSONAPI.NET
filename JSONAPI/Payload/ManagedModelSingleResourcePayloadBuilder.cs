@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JSONAPI.Core;
 using Newtonsoft.Json.Linq;
@@ -12,14 +11,17 @@ namespace JSONAPI.Payload
     public class ManagedModelSingleResourcePayloadBuilder : ISingleResourcePayloadBuilder
     {
         private readonly IModelManager _modelManager;
+        private readonly ILinkConventions _linkConventions;
 
         /// <summary>
         /// Creates a new ManagedModelSingleResourcePayloadBuilder
         /// </summary>
         /// <param name="modelManager">The model manager to use to locate model settings</param>
-        public ManagedModelSingleResourcePayloadBuilder(IModelManager modelManager)
+        /// <param name="linkConventions">Conventions to follow when building links</param>
+        public ManagedModelSingleResourcePayloadBuilder(IModelManager modelManager, ILinkConventions linkConventions)
         {
             _modelManager = modelManager;
+            _linkConventions = linkConventions;
         }
 
         public ISingleResourcePayload BuildPayload<TModel>(TModel primaryData)
@@ -64,15 +66,10 @@ namespace JSONAPI.Payload
                         linkage = new ToOneResourceLinkage(identifier);
                     }
 
-                    ILink selfLink = null;
-                    ILink relatedResourceLink = null;
+                    var selfLink = _linkConventions.GetRelationshipLink(primaryData, _modelManager, relationshipModelProperty);
+                    var relatedResourceLink = _linkConventions.GetRelatedResourceLink(primaryData, _modelManager, relationshipModelProperty);
 
-                    if (relationshipModelProperty.SelfLinkTemplate != null)
-                    {
-                        
-                    }
-
-                    relationships[relationshipModelProperty.JsonKey] = new RelationshipObject(linkage);
+                    relationships[relationshipModelProperty.JsonKey] = new RelationshipObject(linkage, selfLink, relatedResourceLink);
                 }
             }
 
