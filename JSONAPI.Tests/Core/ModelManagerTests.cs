@@ -323,7 +323,7 @@ namespace JSONAPI.Tests.Core
             nameProp.Should().BeOfType<FieldModelProperty>();
 
             postsProp.Property.Should().BeSameAs(authorType.GetProperty("Posts"));
-            postsProp.Should().BeOfType<RelationshipModelProperty>();
+            postsProp.Should().BeOfType<ToManyRelationshipModelProperty>();
         }
 
         [TestMethod]

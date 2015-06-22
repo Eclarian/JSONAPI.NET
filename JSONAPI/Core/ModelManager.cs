@@ -242,7 +242,7 @@ namespace JSONAPI.Core
             {
                 relatedType = type;
             }
-            return new RelationshipModelProperty(prop, jsonKey, ignoreByDefault, relatedType, isToMany);
+            return new ToManyRelationshipModelProperty(prop, jsonKey, ignoreByDefault, relatedType, null, null);
         }
 
         /// <summary>
@@ -252,6 +252,7 @@ namespace JSONAPI.Core
         /// <returns>The type's resource type name</returns>
         protected virtual string CalculateResourceTypeNameForType(Type type)
         {
+
             var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
 
             string title = type.Name;

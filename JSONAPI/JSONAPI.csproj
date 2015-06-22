@@ -96,6 +96,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
     <Compile Include="Http\PascalizedControllerSelector.cs" />
+    <Compile Include="Payload\DefaultLinkConventions.cs" />
     <Compile Include="Payload\DefaultQueryablePayloadBuilder.cs" />
     <Compile Include="Payload\ErrorPayload.cs" />
     <Compile Include="Payload\ErrorSerializer.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Payload\IErrorPayloadSerializer.cs" />
     <Compile Include="Payload\IErrorSerializer.cs" />
     <Compile Include="Payload\IJsonApiSerializer.cs" />
+    <Compile Include="Payload\ILinkConventions.cs" />
     <Compile Include="Payload\ILinkSerializer.cs" />
     <Compile Include="Payload\IMetadata.cs" />
     <Compile Include="Payload\ILink.cs" />

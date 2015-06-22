@@ -46,14 +46,22 @@ namespace JSONAPI.Core
     /// <summary>
     /// A ModelProperty representing a relationship to another resource
     /// </summary>
-    public class RelationshipModelProperty : ModelProperty
+    public abstract class RelationshipModelProperty : ModelProperty
     {
-        internal RelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType, bool isToMany)
+        internal RelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+            string selfLinkTemplate, string relatedResourceLinkTemplate, bool isToMany)
             : base(property, jsonKey, ignoreByDefault)
         {
             RelatedType = relatedType;
+            SelfLinkTemplate = selfLinkTemplate;
+            RelatedResourceLinkTemplate = relatedResourceLinkTemplate;
             IsToMany = isToMany;
         }
+
+        /// <summary>
+        /// Whether this relationship represents a link to a collection of resources or a single one.
+        /// </summary>
+        public bool IsToMany { get; private set; }
 
         /// <summary>
         /// The type of resource found on the other side of this relationship
@@ -61,8 +69,41 @@ namespace JSONAPI.Core
         public Type RelatedType { get; private set; }
 
         /// <summary>
-        /// Whether the property represents a to-many (true) or to-one (false) relationship
+        /// The template for building URLs to access the relationship itself.
+        /// If the string {1} appears in the template, it will be replaced by the ID of resource this
+        /// relationship belongs to.
         /// </summary>
-        public bool IsToMany { get; private set; }
+        public string SelfLinkTemplate { get; private set; }
+
+        /// <summary>
+        /// The template for building URLs to access the data making up the other side of this relationship.
+        /// If the string {1} appears in the template, it will be replaced by the ID of resource this
+        /// relationship belongs to.
+        /// </summary>
+        public string RelatedResourceLinkTemplate { get; private set; }
+    }
+
+    /// <summary>
+    /// A ModelProperty representing a relationship to a collection of resources
+    /// </summary>
+    public sealed class ToManyRelationshipModelProperty : RelationshipModelProperty
+    {
+        internal ToManyRelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+            string selfLinkTemplate, string relatedResourceLinkTemplate)
+            : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A ModelProperty representing a relationship to a single resource
+    /// </summary>
+    public sealed class ToOneRelationshipModelProperty : RelationshipModelProperty
+    {
+        internal ToOneRelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+            string selfLinkTemplate, string relatedResourceLinkTemplate)
+            : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, false)
+        {
+        }
     }
 }

@@ -44,30 +44,35 @@ namespace JSONAPI.Payload
                     continue;
                 }
 
-                var property = modelProperty as RelationshipModelProperty;
-                if (property != null)
+                var relationshipModelProperty = modelProperty as RelationshipModelProperty;
+                if (relationshipModelProperty != null)
                 {
                     IResourceLinkage linkage;
 
-                    var relationshipModelProperty = property;
                     if (relationshipModelProperty.IsToMany)
                     {
                         linkage = null;
                     }
                     else
                     {
-                        var propertyValue = property.Property.GetValue(primaryData);
+                        var propertyValue = relationshipModelProperty.Property.GetValue(primaryData);
                         var propertyValueType = propertyValue.GetType();
                         var propertyValueTypeName = _modelManager.GetResourceTypeNameForType(propertyValueType);
                         var propertyValueTypeIdProperty = _modelManager.GetIdProperty(propertyValueType);
                         var propertyValueTypeId = propertyValueTypeIdProperty.GetValue(propertyValue).ToString();
                         var identifier = new ResourceIdentifier(propertyValueTypeName, propertyValueTypeId);
                         linkage = new ToOneResourceLinkage(identifier);
-
-
                     }
 
-                    relationships[property.JsonKey] = new RelationshipObject(linkage);
+                    ILink selfLink = null;
+                    ILink relatedResourceLink = null;
+
+                    if (relationshipModelProperty.SelfLinkTemplate != null)
+                    {
+                        
+                    }
+
+                    relationships[relationshipModelProperty.JsonKey] = new RelationshipObject(linkage);
                 }
             }
 

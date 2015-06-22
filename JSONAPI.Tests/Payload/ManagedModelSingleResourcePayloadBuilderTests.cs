@@ -51,8 +51,10 @@ namespace JSONAPI.Tests.Payload
             mockModelManager.Setup(m => m.GetProperties(typeof (Country))).Returns(() => new ModelProperty[]
             {
                 new FieldModelProperty(typeof(Country).GetProperty("Name"), "name", false),
-                new RelationshipModelProperty(typeof(Country).GetProperty("Cities"), "cities", false, typeof(City), true),
-                new RelationshipModelProperty(typeof(Country).GetProperty("Continent"), "continent", false, typeof(Continent), false)
+                new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"), "cities", false,
+                    typeof(City), "http://example.com/countries/{1}/relationships/cities", "http://example.com/countries/{1}/cities"),
+                new ToOneRelationshipModelProperty(typeof(Country).GetProperty("Continent"), "continent", false,
+                    typeof(Continent), "http://example.com/countries/{1}/relationships/continent", "http://example.com/countries/{1}/continent")
             });
             var payloadBuilder = new ManagedModelSingleResourcePayloadBuilder(mockModelManager.Object);
 
