@@ -19,47 +19,8 @@ using IErrorSerializer = JSONAPI.Json.IErrorSerializer;
 namespace JSONAPI.Tests.Json
 {
     [TestClass]
-    public class JsonApiMediaFormatterTests
+    public class JsonApiFormatterTests
     {
-        [TestMethod]
-        public void CanWriteType_returns_true_for_SingleResourcePayload()
-        {
-            // Arrange
-            var formatter = new JsonApiFormatter(null, null, null);
-
-            // Act
-            var canWriteType = formatter.CanWriteType(typeof (SingleResourcePayload));
-
-            // Assert
-            canWriteType.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void CanWriteType_returns_true_for_ResourceCollectionPayload()
-        {
-            // Arrange
-            var formatter = new JsonApiFormatter(null, null, null);
-
-            // Act
-            var canWriteType = formatter.CanWriteType(typeof(ResourceCollectionPayload));
-
-            // Assert
-            canWriteType.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void CanWriteType_returns_true_for_ErrorPayload()
-        {
-            // Arrange
-            var formatter = new JsonApiFormatter(null, null, null);
-
-            // Act
-            var canWriteType = formatter.CanWriteType(typeof(ErrorPayload));
-
-            // Assert
-            canWriteType.Should().BeTrue();
-        }
-
         [TestMethod]
         public void Serialize_SingleResourcePayload()
         {
@@ -82,7 +43,7 @@ namespace JSONAPI.Tests.Json
             formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
 
             // Assert
-            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_SingleResourcePayload.json");
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/JsonApiFormatter/Serialize_SingleResourcePayload.json");
         }
 
         [TestMethod]
@@ -107,7 +68,7 @@ namespace JSONAPI.Tests.Json
             formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
 
             // Assert
-            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_ResourceCollectionPayload.json");
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/JsonApiFormatter/Serialize_ResourceCollectionPayload.json");
         }
 
         [TestMethod]
@@ -132,7 +93,50 @@ namespace JSONAPI.Tests.Json
             formatter.WriteToStreamAsync(payload.Object.GetType(), payload.Object, stream, null, null);
 
             // Assert
-            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/Serialize_ErrorPayload.json");
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/JsonApiFormatter/Serialize_ErrorPayload.json");
+        }
+
+        [TestMethod]
+        public void Serialize_HttpError()
+        {
+            // Arrange
+            var singleResourcePayloadSerializer = new Mock<ISingleResourcePayloadSerializer>(MockBehavior.Strict);
+            var resourceCollectionPayloadSerializer = new Mock<IResourceCollectionPayloadSerializer>(MockBehavior.Strict);
+            var errorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer.Object, resourceCollectionPayloadSerializer.Object, errorPayloadSerializer.Object);
+            var stream = new MemoryStream();
+
+            // Act
+            var payload = new HttpError(new Exception("This is the exception message"), true);
+            formatter.WriteToStreamAsync(payload.GetType(), payload, stream, null, null);
+
+            // Assert
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/JsonApiFormatter/Serialize_HttpError.json");
+        }
+
+        private class Color
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+        }
+
+        [TestMethod]
+        public void Writes_error_for_anything_else()
+        {
+            // Arrange
+            var singleResourcePayloadSerializer = new Mock<ISingleResourcePayloadSerializer>(MockBehavior.Strict);
+            var resourceCollectionPayloadSerializer = new Mock<IResourceCollectionPayloadSerializer>(MockBehavior.Strict);
+            var errorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer.Object, resourceCollectionPayloadSerializer.Object, errorPayloadSerializer.Object);
+            var stream = new MemoryStream();
+
+            // Act
+            var payload = new Color { Id = "1", Name = "Blue" };
+            formatter.WriteToStreamAsync(payload.GetType(), payload, stream, null, null);
+
+            // Assert
+            TestHelpers.StreamContentsMatchFixtureContents(stream, "Json/Fixtures/JsonApiFormatter/Writes_error_for_anything_else.json");
         }
 
         //Author a;

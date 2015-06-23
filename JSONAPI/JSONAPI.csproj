@@ -103,6 +103,7 @@
     <Compile Include="Payload\ErrorPayload.cs" />
     <Compile Include="Payload\ErrorPayloadBuilder.cs" />
     <Compile Include="Payload\ErrorSerializer.cs" />
+    <Compile Include="Payload\ExceptionErrorMetadata.cs" />
     <Compile Include="Payload\IError.cs" />
     <Compile Include="Payload\IErrorPayload.cs" />
     <Compile Include="Payload\IErrorPayloadBuilder.cs" />

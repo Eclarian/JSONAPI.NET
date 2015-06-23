@@ -1,0 +1,9 @@
+﻿{
+    "title": "Unexpected HttpError",
+    "detail": "The JsonApiFormatter encountered an unexpected HttpError. If you have enabled FallbackPayloadBuilderAttribute, then this is most likely due to a bug in JSONAPI.NET.",
+    "meta": {
+        "httpErrorMessage": "An error has occurred.",
+        "exceptionMessage": "This is the exception message",
+        "stackTrace": null
+    }
+}

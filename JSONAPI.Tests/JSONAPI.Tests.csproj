@@ -89,7 +89,7 @@
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
-    <Compile Include="Json\JsonApiMediaFormatterTests.cs" />
+    <Compile Include="Json\JsonApiFormatterTests.cs" />
     <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
@@ -98,6 +98,7 @@
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
     <Compile Include="Payload\DefaultLinkConventionsTests.cs" />
+    <Compile Include="Payload\ErrorPayloadBuilderTests.cs" />
     <Compile Include="Payload\JsonApiSerializerTestsBase.cs" />
     <Compile Include="Payload\ErrorSerializerTests.cs" />
     <Compile Include="Payload\ManagedModelSingleResourcePayloadBuilderTests.cs" />
@@ -167,9 +168,11 @@
     <None Include="Data\SerializerIntegrationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="Json\Fixtures\Serialize_SingleResourcePayload.json" />
-    <EmbeddedResource Include="Json\Fixtures\Serialize_ResourceCollectionPayload.json" />
-    <EmbeddedResource Include="Json\Fixtures\Serialize_ErrorPayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_SingleResourcePayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_ResourceCollectionPayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_ErrorPayload.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_HttpError.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Writes_error_for_anything_else.json" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_only.json" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_SingleResourcePayload_for_primary_data_and_metadata.json" />

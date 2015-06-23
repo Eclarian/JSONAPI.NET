@@ -1,0 +1,7 @@
+﻿{
+    "title": "Unexpected Content",
+    "detail": "The JsonApiFormatter was asked to serialize an unsupported object. If you have enabled FallbackPayloadBuilderAttribute, then this is most likely due to a bug in JSONAPI.NET.",
+    "meta": {
+        "objectTypeName": "Color"
+    }
+}

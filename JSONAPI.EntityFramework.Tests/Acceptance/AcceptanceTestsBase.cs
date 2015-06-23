@@ -17,6 +17,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
     [TestClass]
     public abstract class AcceptanceTestsBase
     {
+        private const string JsonApiContentType = "application/vnd.api+json";
         private static readonly Regex GuidRegex = new Regex(@"\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b", RegexOptions.IgnoreCase);
         //private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace"":[\s]*""[\w\:\\\.\s\,\-]*""");
         private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace""[\s]*:[\s]*"".*?""");
@@ -37,7 +38,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             redactedResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
 
             redactedResponse.Should().Be(expectedResponse);
-            response.Content.Headers.ContentType.MediaType.Should().Be("application/vnd.api+json");
+            response.Content.Headers.ContentType.MediaType.Should().Be(JsonApiContentType);
             response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
 
             response.StatusCode.Should().Be(expectedStatusCode);
@@ -54,7 +55,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
-                var response = await server.CreateRequest(uri.ToString()).GetAsync();
+                var response = await server.CreateRequest(uri.ToString()).AddHeader("Accept", JsonApiContentType).GetAsync();
                 return response;
             }
         }
@@ -74,6 +75,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .And(request =>
                     {
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
@@ -98,6 +100,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .And(request =>
                     {
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
@@ -120,6 +123,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var uri = new Uri(BaseUri, requestPath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .SendAsync("DELETE");
                 return response;
             }

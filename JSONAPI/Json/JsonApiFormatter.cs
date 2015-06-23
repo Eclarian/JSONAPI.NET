@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web.Http;
 using JSONAPI.Payload;
+using Newtonsoft.Json;
 
 namespace JSONAPI.Json
 {
@@ -28,7 +31,9 @@ namespace JSONAPI.Json
             _singleResourcePayloadSerializer = singleResourcePayloadSerializer;
             _resourceCollectionPayloadSerializer = resourceCollectionPayloadSerializer;
             _errorPayloadSerializer = errorPayloadSerializer;
-            SupportedMediaTypes.Insert(0, new MediaTypeHeaderValue("application/vnd.api+json"));
+
+            SupportedMediaTypes.Clear();
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
         public override bool CanReadType(Type t)
@@ -36,7 +41,7 @@ namespace JSONAPI.Json
             return true;
         }
 
-        public override bool CanWriteType(Type type)
+        public override bool CanWriteType(Type t)
         {
             return true;
         }
@@ -64,10 +69,17 @@ namespace JSONAPI.Json
             }
             else
             {
-                // The FallbackPayloadBuilderAttribute should have converted anything to one of the above payload types. If not, then there is
-                // an error in this library. Render an error here.
-                // TODO: Format a raw error here.
-                throw new NotImplementedException();
+                var error = value as HttpError;
+                if (error != null)
+                {
+                    // The FallbackPayloadBuilderAttribute should have converted anything to one of the above payload types. If not, then there is
+                    // a bug in this library. Render an error here.
+                    WriteHttpError(error, writer);
+                }
+                else
+                {
+                    WriteErrorForUnsupportedType(value, writer);
+                }
             }
 
             writer.Flush();
@@ -78,6 +90,41 @@ namespace JSONAPI.Json
         public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
             throw new NotImplementedException();
+        }
+
+        private void WriteHttpError(HttpError error, JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("title");
+            writer.WriteValue("Unexpected HttpError");
+            writer.WritePropertyName("detail");
+            writer.WriteValue("The JsonApiFormatter encountered an unexpected HttpError. If you have enabled FallbackPayloadBuilderAttribute, then this is most likely due to a bug in JSONAPI.NET.");
+            writer.WritePropertyName("meta");
+            writer.WriteStartObject();
+            writer.WritePropertyName("httpErrorMessage");
+            writer.WriteValue(error.Message);
+            writer.WritePropertyName("exceptionMessage");
+            writer.WriteValue(error.ExceptionMessage);
+            writer.WritePropertyName("stackTrace");
+            writer.WriteValue(error.StackTrace);
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+        }
+
+        private void WriteErrorForUnsupportedType(object obj, JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("title");
+            writer.WriteValue("Unexpected Content");
+            writer.WritePropertyName("detail");
+            writer.WriteValue("The JsonApiFormatter was asked to serialize an unsupported object. If you have enabled FallbackPayloadBuilderAttribute, then this is most likely due to a bug in JSONAPI.NET.");
+            writer.WritePropertyName("meta");
+            writer.WriteStartObject();
+            writer.WritePropertyName("objectTypeName");
+            writer.WriteValue(obj.GetType().Name);
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+            
         }
     }
 }

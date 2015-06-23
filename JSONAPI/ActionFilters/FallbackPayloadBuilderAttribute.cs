@@ -63,6 +63,8 @@ namespace JSONAPI.ActionFilters
                     Content = new ObjectContent(payload.GetType(), payload, formatter)
                 };
             }
+
+            await Task.Yield();
         }
     }
 }
