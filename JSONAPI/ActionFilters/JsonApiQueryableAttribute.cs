@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Filters;
 using JSONAPI.Payload;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.ActionFilters
 {

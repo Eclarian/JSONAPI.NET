@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using JSONAPI.Json;
 using JSONAPI.Payload;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.ActionFilters
 {
@@ -13,20 +14,20 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class FallbackPayloadBuilderAttribute : ActionFilterAttribute
     {
-        private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
+        private readonly IFallbackPayloadBuilder _fallbackPayloadBuilder;
         private readonly IErrorPayloadBuilder _errorPayloadBuilder;
         private readonly IErrorPayloadSerializer _errorPayloadSerializer;
 
         /// <summary>
         /// Creates a FallbackPayloadBuilderAttribute
         /// </summary>
-        /// <param name="singleResourcePayloadBuilder"></param>
+        /// <param name="fallbackPayloadBuilder"></param>
         /// <param name="errorPayloadBuilder"></param>
         /// <param name="errorPayloadSerializer"></param>
-        public FallbackPayloadBuilderAttribute(ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+        public FallbackPayloadBuilderAttribute(IFallbackPayloadBuilder fallbackPayloadBuilder,
             IErrorPayloadBuilder errorPayloadBuilder, IErrorPayloadSerializer errorPayloadSerializer)
         {
-            _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
+            _fallbackPayloadBuilder = fallbackPayloadBuilder;
             _errorPayloadBuilder = errorPayloadBuilder;
             _errorPayloadSerializer = errorPayloadSerializer;
         }
@@ -53,6 +54,10 @@ namespace JSONAPI.ActionFilters
                     if (actionExecutedContext.Exception != null)
                     {
                         payloadValue = _errorPayloadBuilder.BuildFromException(actionExecutedContext.Exception);
+                    }
+                    else
+                    {
+                        payloadValue = _fallbackPayloadBuilder.BuildPayload(payloadValue);
                     }
 
                     actionExecutedContext.Response.Content = new ObjectContent(payloadValue.GetType(), payloadValue, objectContent.Formatter);

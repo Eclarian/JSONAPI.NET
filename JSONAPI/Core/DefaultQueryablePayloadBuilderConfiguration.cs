@@ -1,5 +1,5 @@
 ﻿using JSONAPI.ActionFilters;
-using JSONAPI.Payload;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.Core
 {

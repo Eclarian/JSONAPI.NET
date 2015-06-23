@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JSONAPI.Payload
+namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// This interface is responsible for building IPayload objects based on IQueryable ObjectContent

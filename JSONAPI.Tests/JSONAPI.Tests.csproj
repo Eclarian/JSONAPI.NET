@@ -97,11 +97,12 @@
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
+    <Compile Include="Payload\Builders\FallbackPayloadBuilderTests.cs" />
+    <Compile Include="Payload\Builders\ManagedModelSingleResourcePayloadBuilderTests.cs" />
     <Compile Include="Payload\DefaultLinkConventionsTests.cs" />
     <Compile Include="Payload\ErrorPayloadBuilderTests.cs" />
     <Compile Include="Payload\JsonApiSerializerTestsBase.cs" />
     <Compile Include="Payload\ErrorSerializerTests.cs" />
-    <Compile Include="Payload\ManagedModelSingleResourcePayloadBuilderTests.cs" />
     <Compile Include="Payload\ResourceLinkageSerializerTests.cs" />
     <Compile Include="Payload\MetadataSerializerTests.cs" />
     <Compile Include="Payload\RelationshipObjectSerializerTests.cs" />

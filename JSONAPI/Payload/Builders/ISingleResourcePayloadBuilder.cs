@@ -1,4 +1,4 @@
-﻿namespace JSONAPI.Payload
+﻿namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// Builds a response payload from primary data objects

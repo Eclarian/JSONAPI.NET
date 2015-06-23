@@ -26,7 +26,6 @@ namespace JSONAPI.TodoMVC.API
 
             // Configure JSON API
             new JsonApiConfiguration(modelManager)
-                .UsingDefaultQueryablePayloadBuilder(c => c.EnumerateQueriesAsynchronously())
                 .Apply(httpConfig);
 
             // Web API routes

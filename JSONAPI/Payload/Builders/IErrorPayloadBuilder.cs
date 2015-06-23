@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JSONAPI.Payload
+namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// Provides services for building an error payload

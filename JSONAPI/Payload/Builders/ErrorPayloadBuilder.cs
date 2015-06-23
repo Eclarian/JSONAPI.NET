@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace JSONAPI.Payload
+namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// Default implementation of IErrorPayloadBuilder

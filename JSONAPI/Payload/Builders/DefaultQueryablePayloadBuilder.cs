@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.ActionFilters;
 
-namespace JSONAPI.Payload
+namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// Provides a default implementation of an IQueryablePayloadBuilder
