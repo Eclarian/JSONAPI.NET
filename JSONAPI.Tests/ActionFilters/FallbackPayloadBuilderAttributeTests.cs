@@ -132,9 +132,32 @@ namespace JSONAPI.Tests.ActionFilters
             newObjectContent.Should().BeSameAs(resultErrorPayload);
         }
 
-        public void OnActionExecutedAsync_creates_ISingleResourcePayload_for_model_found_by_model_manager()
+        private class Fruit
         {
-            
+        }
+
+        [TestMethod]
+        public void OnActionExecutedAsync_delegates_to_fallback_payload_builder_for_unknown_types()
+        {
+            // Arrange
+            var payload = new Fruit();
+            var actionExecutedContext = GetActionExecutedContext(payload);
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            var mockResult = new Mock<IJsonApiPayload>(MockBehavior.Strict);
+            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
+            mockFallbackPayloadBuilder.Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>())).Returns(mockResult.Object);
+
+            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
+            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+
+            // Act
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
+            task.Wait();
+
+            // Assert
+            ((ObjectContent) actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
         }
     }
 }

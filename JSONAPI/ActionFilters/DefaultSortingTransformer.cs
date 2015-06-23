@@ -13,15 +13,15 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class DefaultSortingTransformer : IQueryableSortingTransformer
     {
-        private readonly IModelManager _modelManager;
+        private readonly IResourceTypeRegistry _resourceTypeRegistry;
 
         /// <summary>
         /// Creates a new SortingQueryableTransformer
         /// </summary>
-        /// <param name="modelManager">The model manager used to look up registered type information.</param>
-        public DefaultSortingTransformer(IModelManager modelManager)
+        /// <param name="resourceTypeRegistry">The model manager used to look up registered type information.</param>
+        public DefaultSortingTransformer(IResourceTypeRegistry resourceTypeRegistry)
         {
-            _modelManager = modelManager;
+            _resourceTypeRegistry = resourceTypeRegistry;
         }
         
         private const string SortQueryParamKey = "sort";
@@ -58,11 +58,12 @@ namespace JSONAPI.ActionFilters
                 if (string.IsNullOrWhiteSpace(propertyName))
                     throw new QueryableTransformException("The property name is missing.");
 
-                var modelProperty = _modelManager.GetPropertyForJsonKey(typeof(T), propertyName);
+                var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
 
+                var modelProperty = registration.GetFieldByName(propertyName);
                 if (modelProperty == null)
                     throw new QueryableTransformException(string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
-                        propertyName, _modelManager.GetResourceTypeNameForType(typeof (T))));
+                        propertyName, registration.ResourceTypeName));
 
                 var property = modelProperty.Property;
                 

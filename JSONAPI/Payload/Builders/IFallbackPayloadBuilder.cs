@@ -1,3 +1,5 @@
+using System.Net.Http;
+
 namespace JSONAPI.Payload.Builders
 {
     /// <summary>
@@ -10,6 +12,6 @@ namespace JSONAPI.Payload.Builders
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        object BuildPayload(object obj);
+        IJsonApiPayload BuildPayload(object obj, HttpRequestMessage requestMessage);
     }
 }

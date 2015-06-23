@@ -8,6 +8,7 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class DefaultQueryablePayloadBuilderConfiguration
     {
+        private readonly IResourceCollectionPayloadBuilder _resourceCollectionPayloadBuilder;
         private bool _enableFiltering;
         private bool _enableSorting;
         private bool _enablePagination;
@@ -16,8 +17,9 @@ namespace JSONAPI.Core
         private IQueryablePaginationTransformer _paginationTransformer;
         private IQueryableEnumerationTransformer _enumerationTransformer;
 
-        internal DefaultQueryablePayloadBuilderConfiguration()
+        internal DefaultQueryablePayloadBuilderConfiguration(IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder)
         {
+            _resourceCollectionPayloadBuilder = resourceCollectionPayloadBuilder;
             _enableFiltering = true;
             _enableSorting = true;
             _enablePagination = true;
@@ -97,15 +99,15 @@ namespace JSONAPI.Core
             return this;
         }
 
-        internal DefaultQueryablePayloadBuilder GetBuilder(IModelManager modelManager)
+        internal DefaultQueryableResourceCollectionPayloadBuilder GetBuilder(IResourceTypeRegistry resourceTypeRegistry)
         {
             IQueryableFilteringTransformer filteringTransformer = null;
             if (_enableFiltering)
-                filteringTransformer = _filteringTransformer ?? new DefaultFilteringTransformer(modelManager);
+                filteringTransformer = _filteringTransformer ?? new DefaultFilteringTransformer(resourceTypeRegistry);
 
             IQueryableSortingTransformer sortingTransformer = null;
             if (_enableSorting)
-                sortingTransformer = _sortingTransformer ?? new DefaultSortingTransformer(modelManager);
+                sortingTransformer = _sortingTransformer ?? new DefaultSortingTransformer(resourceTypeRegistry);
 
             IQueryablePaginationTransformer paginationTransformer = null;
             if (_enablePagination)
@@ -115,7 +117,8 @@ namespace JSONAPI.Core
             IQueryableEnumerationTransformer enumerationTransformer =
                 _enumerationTransformer ?? new SynchronousEnumerationTransformer();
 
-            return new DefaultQueryablePayloadBuilder(enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
+            return new DefaultQueryableResourceCollectionPayloadBuilder(_resourceCollectionPayloadBuilder,
+                enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace JSONAPI.Payload.Builders
     /// <summary>
     /// This interface is responsible for building IPayload objects based on IQueryable ObjectContent
     /// </summary>
-    public interface IQueryablePayloadBuilder
+    public interface IQueryableResourceCollectionPayloadBuilder
     {
         /// <summary>
         /// Builds a payload object for the given query

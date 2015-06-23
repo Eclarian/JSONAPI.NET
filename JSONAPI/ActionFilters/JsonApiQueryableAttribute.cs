@@ -18,13 +18,13 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class JsonApiQueryableAttribute : ActionFilterAttribute
     {
-        private readonly IQueryablePayloadBuilder _payloadBuilder;
+        private readonly IQueryableResourceCollectionPayloadBuilder _payloadBuilder;
         private readonly Lazy<MethodInfo> _openBuildPayloadMethod;
 
         /// <summary>
         /// Creates a new JsonApiQueryableAttribute.
         /// </summary>
-        public JsonApiQueryableAttribute(IQueryablePayloadBuilder payloadBuilder)
+        public JsonApiQueryableAttribute(IQueryableResourceCollectionPayloadBuilder payloadBuilder)
         {
             _payloadBuilder = payloadBuilder;
             _openBuildPayloadMethod =

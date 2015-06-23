@@ -10,8 +10,9 @@ namespace JSONAPI.Payload.Builders
     /// <summary>
     /// Provides a default implementation of an IQueryablePayloadBuilder
     /// </summary>
-    public class DefaultQueryablePayloadBuilder : IQueryablePayloadBuilder
+    public class DefaultQueryableResourceCollectionPayloadBuilder : IQueryableResourceCollectionPayloadBuilder
     {
+        private readonly IResourceCollectionPayloadBuilder _resourceCollectionPayloadBuilder;
         private readonly IQueryableEnumerationTransformer _enumerationTransformer;
         private readonly IQueryableFilteringTransformer _filteringTransformer;
         private readonly IQueryableSortingTransformer _sortingTransformer;
@@ -20,16 +21,19 @@ namespace JSONAPI.Payload.Builders
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="resourceCollectionPayloadBuilder"></param>
         /// <param name="enumerationTransformer"></param>
         /// <param name="filteringTransformer"></param>
         /// <param name="sortingTransformer"></param>
         /// <param name="paginationTransformer"></param>
-        public DefaultQueryablePayloadBuilder(
+        public DefaultQueryableResourceCollectionPayloadBuilder(
+            IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder,
             IQueryableEnumerationTransformer enumerationTransformer,
-            IQueryableFilteringTransformer filteringTransformer = null,
-            IQueryableSortingTransformer sortingTransformer = null,
-            IQueryablePaginationTransformer paginationTransformer = null)
+            IQueryableFilteringTransformer filteringTransformer,
+            IQueryableSortingTransformer sortingTransformer,
+            IQueryablePaginationTransformer paginationTransformer)
         {
+            _resourceCollectionPayloadBuilder = resourceCollectionPayloadBuilder;
             _enumerationTransformer = enumerationTransformer;
             _filteringTransformer = filteringTransformer;
             _sortingTransformer = sortingTransformer;
@@ -51,12 +55,7 @@ namespace JSONAPI.Payload.Builders
             }
 
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
-
-            throw new NotImplementedException();
-            //return new Payload
-            //{
-            //    PrimaryData = results
-            //};
+            return _resourceCollectionPayloadBuilder.BuildPayload(results);
         }
     }
 }

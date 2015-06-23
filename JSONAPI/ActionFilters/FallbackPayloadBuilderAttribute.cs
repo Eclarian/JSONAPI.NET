@@ -57,7 +57,7 @@ namespace JSONAPI.ActionFilters
                     }
                     else
                     {
-                        payloadValue = _fallbackPayloadBuilder.BuildPayload(payloadValue);
+                        payloadValue = _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request);
                     }
 
                     actionExecutedContext.Response.Content = new ObjectContent(payloadValue.GetType(), payloadValue, objectContent.Formatter);

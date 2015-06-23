@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace JSONAPI.Tests.Payload.Builders
 {
     [TestClass]
-    public class ManagedModelSingleResourcePayloadBuilderTests
+    public class RegistryDrivenSingleResourcePayloadBuilderTests
     {
         class Country
         {
@@ -55,45 +55,6 @@ namespace JSONAPI.Tests.Payload.Builders
         public void Returns_correct_payload_for_resource()
         {
             // Arrange
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(City))).Returns(typeof(City).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Province))).Returns(typeof(Province).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Continent))).Returns(typeof(Continent).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Country))).Returns("countries");
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(City))).Returns("cities");
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Province))).Returns("provinces");
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Continent))).Returns("continents");
-
-            var countryNameProperty = new FieldModelProperty(typeof (Country).GetProperty("Name"), "name", false);
-            var countryCitiesProperty =
-                new ToManyRelationshipModelProperty(typeof (Country).GetProperty("Cities"), "cities", false, typeof (City), null, null);
-            var countryProvincesProperty =
-                new ToManyRelationshipModelProperty(typeof (Country).GetProperty("Provinces"), "provinces", false, typeof(Province), null, null);
-            var countryContinentProperty =
-                new ToOneRelationshipModelProperty(typeof(Country).GetProperty("Continent"), "continent", false, typeof(Continent), null, null);
-            mockModelManager
-                .Setup(m => m.GetProperties(typeof(Country)))
-                .Returns(() => new ModelProperty[] { countryNameProperty, countryCitiesProperty, countryProvincesProperty, countryContinentProperty });
-
-            var cityNameProperty = new FieldModelProperty(typeof(City).GetProperty("Name"), "name", false);
-            mockModelManager
-                .Setup(m => m.GetProperties(typeof(City)))
-                .Returns(() => new ModelProperty[] { cityNameProperty });
-
-            var provinceNameProperty = new FieldModelProperty(typeof(Province).GetProperty("Name"), "name", false);
-            var provinceCapitalProperty = new ToOneRelationshipModelProperty(typeof (Province).GetProperty("Capital"), "capital", false, typeof(City), null, null);
-            mockModelManager
-                .Setup(m => m.GetProperties(typeof(Province)))
-                .Returns(() => new ModelProperty[] { provinceNameProperty, provinceCapitalProperty });
-
-            var continentNameProperty = new FieldModelProperty(typeof(Continent).GetProperty("Name"), "name", false);
-            var continentCountriesProperty =
-                new ToManyRelationshipModelProperty(typeof(Continent).GetProperty("Countries"), "countries", false, typeof(Country), null, null);
-            mockModelManager
-                .Setup(m => m.GetProperties(typeof (Continent)))
-                .Returns(() => new ModelProperty[] { continentNameProperty, continentCountriesProperty });
-            
             var city1 = new City
             {
                 Id = "10",
@@ -141,10 +102,67 @@ namespace JSONAPI.Tests.Payload.Builders
                 Cities = new List<City> { city1, city2, city3 }
             };
 
+
+            // Country registration
+            var countryName = new ResourceTypeAttribute(typeof(Country).GetProperty("Name"), "name", false);
+            var countryCities =
+                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"), "cities", false, typeof(City), null, null);
+            var countryProvinces =
+                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Provinces"), "provinces", false, typeof(Province), null, null);
+            var countryContinent =
+                new ToOneResourceTypeRelationship(typeof(Country).GetProperty("Continent"), "continent", false, typeof(Continent), null, null);
+            var countryRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            countryRegistration.Setup(m => m.GetIdForResource(It.IsAny<Country>())).Returns((Country c) => country.Id);
+            countryRegistration.Setup(m => m.ResourceTypeName).Returns("countries");
+            countryRegistration.Setup(m => m.Attributes).Returns(new[] { countryName });
+            countryRegistration
+                .Setup(m => m.Relationships)
+                .Returns(() => new ResourceTypeRelationship[] { countryCities, countryProvinces, countryContinent });
+
+
+            // City registration
+            var cityNameProperty = new ResourceTypeAttribute(typeof(City).GetProperty("Name"), "name", false);
+            var cityRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            cityRegistration.Setup(m => m.ResourceTypeName).Returns("cities");
+            cityRegistration.Setup(m => m.GetIdForResource(It.IsAny<City>())).Returns((City c) => c.Id);
+            cityRegistration.Setup(m => m.Attributes).Returns(new[] { cityNameProperty });
+            cityRegistration.Setup(m => m.Relationships).Returns(new ResourceTypeRelationship[] { });
+
+
+            // Province registration
+            var provinceName = new ResourceTypeAttribute(typeof(Province).GetProperty("Name"), "name", false);
+            var provinceCapital = new ToOneResourceTypeRelationship(typeof(Province).GetProperty("Capital"), "capital", false, typeof(City), null, null);
+            var provinceRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            provinceRegistration.Setup(m => m.ResourceTypeName).Returns("provinces");
+            provinceRegistration.Setup(m => m.GetIdForResource(It.IsAny<Province>())).Returns((Province c) => c.Id);
+            provinceRegistration.Setup(m => m.Attributes).Returns(new[] { provinceName });
+            provinceRegistration
+                .Setup(m => m.Relationships)
+                .Returns(() => new ResourceTypeRelationship[] { provinceCapital });
+
+
+            // Continent registration
+            var continentName = new ResourceTypeAttribute(typeof(Continent).GetProperty("Name"), "name", false);
+            var continentCountries =
+                new ToManyResourceTypeRelationship(typeof(Continent).GetProperty("Countries"), "countries", false, typeof(Country), null, null);
+            var continentRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            continentRegistration.Setup(m => m.ResourceTypeName).Returns("continents");
+            continentRegistration.Setup(m => m.GetIdForResource(It.IsAny<Continent>())).Returns((Continent c) => c.Id);
+            continentRegistration.Setup(m => m.Attributes).Returns(new[] { continentName });
+            continentRegistration
+                .Setup(m => m.Relationships)
+                .Returns(() => new ResourceTypeRelationship[] { continentCountries });
+
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(r => r.GetRegistrationForType(typeof(Country))).Returns(countryRegistration.Object);
+            mockRegistry.Setup(r => r.GetRegistrationForType(typeof(City))).Returns(cityRegistration.Object);
+            mockRegistry.Setup(r => r.GetRegistrationForType(typeof(Province))).Returns(provinceRegistration.Object);
+            mockRegistry.Setup(r => r.GetRegistrationForType(typeof(Continent))).Returns(continentRegistration.Object);
+
             var linkConventions = new DefaultLinkConventions("http://www.example.com");
 
             // Act
-            var payloadBuilder = new ManagedModelSingleResourcePayloadBuilder(mockModelManager.Object, linkConventions);
+            var payloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(mockRegistry.Object, linkConventions);
             var payload = payloadBuilder.BuildPayload(country, "provinces.capital", "continent");
 
             // Assert
@@ -245,7 +263,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "posts";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeTrue();
@@ -259,7 +277,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "comments";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeFalse();
@@ -273,7 +291,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeFalse();
@@ -287,7 +305,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = null;
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeFalse();
@@ -301,7 +319,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "posts.author";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeTrue();
@@ -315,7 +333,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "posts.author.comments";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeTrue();
@@ -329,7 +347,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "author.posts.author";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeFalse();
@@ -343,7 +361,7 @@ namespace JSONAPI.Tests.Payload.Builders
             const string pathToInclude = "posts.authora";
 
             // Act
-            var matches = ManagedModelSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
+            var matches = RegistryDrivenSingleResourcePayloadBuilder.PathExpressionMatchesCurrentPath(currentPath, pathToInclude);
 
             // Assert
             matches.Should().BeFalse();

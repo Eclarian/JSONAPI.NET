@@ -6,6 +6,7 @@ using Autofac;
 using Autofac.Integration.WebApi;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.Payload;
 using Microsoft.Owin;
 using Owin;
 
@@ -60,7 +61,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             
             // Configure the model manager
             var pluralizationService = new PluralizationService();
-            var modelManager = new ModelManager(pluralizationService)
+            var modelManager = new ResourceTypeRegistry(pluralizationService)
                 .RegisterResourceType(typeof (City))
                 .RegisterResourceType(typeof (Comment))
                 .RegisterResourceType(typeof (Post))
@@ -69,8 +70,10 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
                 .RegisterResourceType(typeof (User))
                 .RegisterResourceType(typeof (UserGroup));
 
+            var linkConventions = new DefaultLinkConventions("https://www.example.com");
+
             // Configure JSON API
-            new JsonApiConfiguration(modelManager)
+            new JsonApiConfiguration(modelManager, linkConventions)
                 .Apply(httpConfig);
 
 

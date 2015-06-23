@@ -85,13 +85,15 @@
     <Compile Include="Attributes\UseAsIdAttribute.cs" />
     <Compile Include="Core\DefaultQueryablePayloadBuilderConfiguration.cs" />
     <Compile Include="Core\IMetadataManager.cs" />
-    <Compile Include="Core\IModelManager.cs" />
+    <Compile Include="Core\IResourceTypeRegistry.cs" />
+    <Compile Include="Core\IResourceTypeRegistration.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\JsonApiConfiguration.cs" />
     <Compile Include="Core\MetadataManager.cs" />
-    <Compile Include="Core\ModelManager.cs" />
-    <Compile Include="Core\ModelProperty.cs" />
+    <Compile Include="Core\ResourceTypeRegistry.cs" />
+    <Compile Include="Core\ResourceTypeField.cs" />
+    <Compile Include="Core\TypeRegistrationNotFoundException.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
@@ -99,8 +101,10 @@
     <Compile Include="Http\PascalizedControllerSelector.cs" />
     <Compile Include="Payload\Builders\FallbackPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\IFallbackPayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\IResourceCollectionPayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\RegistryDrivenResourceCollectionPayloadBuilder.cs" />
     <Compile Include="Payload\DefaultLinkConventions.cs" />
-    <Compile Include="Payload\Builders\DefaultQueryablePayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\DefaultQueryableResourceCollectionPayloadBuilder.cs" />
     <Compile Include="Payload\Error.cs" />
     <Compile Include="Payload\ErrorPayload.cs" />
     <Compile Include="Payload\Builders\ErrorPayloadBuilder.cs" />
@@ -111,6 +115,7 @@
     <Compile Include="Payload\Builders\IErrorPayloadBuilder.cs" />
     <Compile Include="Payload\IErrorPayloadSerializer.cs" />
     <Compile Include="Payload\IErrorSerializer.cs" />
+    <Compile Include="Payload\IJsonApiPayload.cs" />
     <Compile Include="Payload\IJsonApiSerializer.cs" />
     <Compile Include="Payload\ILinkConventions.cs" />
     <Compile Include="Payload\ILinkSerializer.cs" />
@@ -124,7 +129,7 @@
     <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Json\RelationAggregator.cs" />
     <Compile Include="Payload\IMetadataSerializer.cs" />
-    <Compile Include="Payload\Builders\IQueryablePayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\IQueryableResourceCollectionPayloadBuilder.cs" />
     <Compile Include="Payload\IRelationshipObject.cs" />
     <Compile Include="Payload\IRelationshipObjectSerializer.cs" />
     <Compile Include="Payload\IResourceCollectionPayload.cs" />
@@ -138,7 +143,7 @@
     <Compile Include="Payload\ISingleResourcePayload.cs" />
     <Compile Include="Payload\ISingleResourcePayloadSerializer.cs" />
     <Compile Include="Payload\LinkSerializer.cs" />
-    <Compile Include="Payload\Builders\ManagedModelSingleResourcePayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\RegistryDrivenSingleResourcePayloadBuilder.cs" />
     <Compile Include="Payload\MetadataSerializer.cs" />
     <Compile Include="Payload\RelationshipObject.cs" />
     <Compile Include="Payload\RelationshipObjectSerializer.cs" />

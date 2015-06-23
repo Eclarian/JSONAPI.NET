@@ -3,16 +3,11 @@
     /// <summary>
     /// Interface for JSON API payloads that represent a collection of errors
     /// </summary>
-    public interface IErrorPayload
+    public interface IErrorPayload : IJsonApiPayload
     {
         /// <summary>
         /// The errors to send in this payload
         /// </summary>
         IError[] Errors { get; }
-
-        /// <summary>
-        /// Metadata for the payload as a whole
-        /// </summary>
-        IMetadata Metadata { get; }
     }
 }

@@ -19,16 +19,16 @@ namespace JSONAPI.Payload
             _baseUrl = baseUrl;
         }
 
-        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IModelManager modelManager, RelationshipModelProperty property)
+        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property)
         {
-            var url = BuildRelationshipUrl(relationshipOwner, modelManager, property);
+            var url = BuildRelationshipUrl(relationshipOwner, resourceTypeRegistry, property);
             var metadata = GetMetadataForRelationshipLink(relationshipOwner, property);
             return new Link(url, metadata);
         }
 
-        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IModelManager modelManager, RelationshipModelProperty property)
+        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property)
         {
-            var url = BuildRelatedResourceUrl(relationshipOwner, modelManager, property);
+            var url = BuildRelatedResourceUrl(relationshipOwner, resourceTypeRegistry, property);
             var metadata = GetMetadataForRelatedResourceLink(relationshipOwner, property);
             return new Link(url, metadata);
         }
@@ -45,31 +45,30 @@ namespace JSONAPI.Payload
         /// Constructs a URL for the relationship belonging to the given resource
         /// </summary>
         /// <param name="relationshipOwner"></param>
-        /// <param name="modelManager"></param>
+        /// <param name="resourceTypeRegistry"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        protected virtual string BuildRelationshipUrl(object relationshipOwner, IModelManager modelManager,
-            RelationshipModelProperty property)
+        protected virtual string BuildRelationshipUrl(object relationshipOwner, IResourceTypeRegistry resourceTypeRegistry,
+            ResourceTypeRelationship property)
         {
             var relationshipOwnerType = relationshipOwner.GetType();
             var sanitizedBaseUrl = GetSanitizedBaseUrl();
-            var idProp = modelManager.GetIdProperty(relationshipOwner.GetType());
-            var idPropValue = idProp.GetValue(relationshipOwner).ToString();
+            var registration = resourceTypeRegistry.GetRegistrationForType(relationshipOwnerType);
+            var id = registration.GetIdForResource(relationshipOwner);
             if (property.SelfLinkTemplate != null)
             {
-                var replacedString = property.SelfLinkTemplate.Replace("{1}", idPropValue);
+                var replacedString = property.SelfLinkTemplate.Replace("{1}", id);
                 return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
             }
 
-            var resourceTypeName = modelManager.GetResourceTypeNameForType(relationshipOwnerType);
-            return String.Format("{0}/{1}/{2}/relationships/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
+            return String.Format("{0}/{1}/{2}/relationships/{3}", sanitizedBaseUrl, registration.ResourceTypeName, id, property.JsonKey);
         }
 
         /// <summary>
         /// Gets a metadata object to serialize alongside the link URL for relationship links.
         /// </summary>
         /// <returns></returns>
-        protected virtual IMetadata GetMetadataForRelationshipLink<TResource>(TResource relationshipOwner, RelationshipModelProperty property)
+        protected virtual IMetadata GetMetadataForRelationshipLink<TResource>(TResource relationshipOwner, ResourceTypeRelationship property)
         {
             return null;
         }
@@ -78,31 +77,30 @@ namespace JSONAPI.Payload
         /// Constructs a URL for the resource(s) on the other side of the given relationship, belonging to the given resource
         /// </summary>
         /// <param name="relationshipOwner"></param>
-        /// <param name="modelManager"></param>
+        /// <param name="resourceTypeRegistry"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        protected virtual string BuildRelatedResourceUrl(object relationshipOwner, IModelManager modelManager,
-            RelationshipModelProperty property)
+        protected virtual string BuildRelatedResourceUrl(object relationshipOwner, IResourceTypeRegistry resourceTypeRegistry,
+            ResourceTypeRelationship property)
         {
             var relationshipOwnerType = relationshipOwner.GetType();
             var sanitizedBaseUrl = GetSanitizedBaseUrl();
-            var idProp = modelManager.GetIdProperty(relationshipOwnerType);
-            var idPropValue = idProp.GetValue(relationshipOwner).ToString();
+            var registration = resourceTypeRegistry.GetRegistrationForType(relationshipOwnerType);
+            var id = registration.GetIdForResource(relationshipOwner);
             if (property.RelatedResourceLinkTemplate != null)
             {
-                var replacedString = property.RelatedResourceLinkTemplate.Replace("{1}", idPropValue);
+                var replacedString = property.RelatedResourceLinkTemplate.Replace("{1}", id);
                 return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
             }
 
-            var resourceTypeName = modelManager.GetResourceTypeNameForType(relationshipOwnerType);
-            return String.Format("{0}/{1}/{2}/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
+            return String.Format("{0}/{1}/{2}/{3}", sanitizedBaseUrl, registration.ResourceTypeName, id, property.JsonKey);
         }
 
         /// <summary>
         /// Gets a metadata object to serialize alongside the link URL for related resource links.
         /// </summary>
         /// <returns></returns>
-        protected virtual IMetadata GetMetadataForRelatedResourceLink<TResource>(TResource relationshipOwner, RelationshipModelProperty property)
+        protected virtual IMetadata GetMetadataForRelatedResourceLink<TResource>(TResource relationshipOwner, ResourceTypeRelationship property)
         {
             return null;
         }

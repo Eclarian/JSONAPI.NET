@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 
 namespace JSONAPI.Core
@@ -7,9 +6,9 @@ namespace JSONAPI.Core
     /// <summary>
     /// Stores a model's property and its usage.
     /// </summary>
-    public abstract class ModelProperty
+    public abstract class ResourceTypeField
     {
-        internal ModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault)
+        internal ResourceTypeField(PropertyInfo property, string jsonKey, bool ignoreByDefault)
         {
             IgnoreByDefault = ignoreByDefault;
             JsonKey = jsonKey;
@@ -35,9 +34,9 @@ namespace JSONAPI.Core
     /// <summary>
     /// A ModelProperty representing a flat field on a resource object
     /// </summary>
-    public sealed class FieldModelProperty : ModelProperty
+    public sealed class ResourceTypeAttribute : ResourceTypeField
     {
-        internal FieldModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault)
+        internal ResourceTypeAttribute(PropertyInfo property, string jsonKey, bool ignoreByDefault)
             : base(property, jsonKey, ignoreByDefault)
         {
         }
@@ -46,9 +45,9 @@ namespace JSONAPI.Core
     /// <summary>
     /// A ModelProperty representing a relationship to another resource
     /// </summary>
-    public abstract class RelationshipModelProperty : ModelProperty
+    public abstract class ResourceTypeRelationship : ResourceTypeField
     {
-        internal RelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate, bool isToMany)
             : base(property, jsonKey, ignoreByDefault)
         {
@@ -86,9 +85,9 @@ namespace JSONAPI.Core
     /// <summary>
     /// A ModelProperty representing a relationship to a collection of resources
     /// </summary>
-    public sealed class ToManyRelationshipModelProperty : RelationshipModelProperty
+    public sealed class ToManyResourceTypeRelationship : ResourceTypeRelationship
     {
-        internal ToManyRelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ToManyResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate)
             : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true)
         {
@@ -98,9 +97,9 @@ namespace JSONAPI.Core
     /// <summary>
     /// A ModelProperty representing a relationship to a single resource
     /// </summary>
-    public sealed class ToOneRelationshipModelProperty : RelationshipModelProperty
+    public sealed class ToOneResourceTypeRelationship : ResourceTypeRelationship
     {
-        internal ToOneRelationshipModelProperty(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ToOneResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate)
             : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, false)
         {

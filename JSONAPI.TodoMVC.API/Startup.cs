@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework;
+using JSONAPI.Payload;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 using PluralizationService = JSONAPI.Core.PluralizationService;
@@ -19,13 +20,15 @@ namespace JSONAPI.TodoMVC.API
         {
             var pluralizationService = new PluralizationService();
             pluralizationService.AddMapping("todo", "todos");
-            var modelManager = new ModelManager(pluralizationService);
+            var modelManager = new ResourceTypeRegistry(pluralizationService);
             modelManager.RegisterResourceType(typeof (Todo));
 
             var httpConfig = new HttpConfiguration();
 
+            var linkConventions = new DefaultLinkConventions("https://www.example.com");
+
             // Configure JSON API
-            new JsonApiConfiguration(modelManager)
+            new JsonApiConfiguration(modelManager, linkConventions)
                 .Apply(httpConfig);
 
             // Web API routes

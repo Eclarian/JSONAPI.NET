@@ -50,9 +50,9 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 {"Dummy", "Dummies"}
             });
-            var modelManager = new ModelManager(pluralizationService);
-            modelManager.RegisterResourceType(typeof(Dummy));
-            return new DefaultSortingTransformer(modelManager);
+            var registry = new ResourceTypeRegistry(pluralizationService);
+            registry.RegisterResourceType(typeof(Dummy));
+            return new DefaultSortingTransformer(registry);
         }
 
         private Dummy[] GetArray(string uri)

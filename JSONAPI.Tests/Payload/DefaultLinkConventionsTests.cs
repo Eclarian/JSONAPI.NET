@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using JSONAPI.Core;
 using JSONAPI.Payload;
@@ -31,15 +27,17 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof (Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof (Country).GetProperty("Cities"),
                 "cities", false, typeof (City), null, null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof (Country))).Returns(typeof (Country).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof (Country))).Returns("countries");
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/relationships/cities");
@@ -50,15 +48,17 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), null, null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Country))).Returns("countries");
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/relationships/cities");
@@ -69,14 +69,16 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), "foo/{1}/bar", null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/foo/45/bar");
@@ -87,14 +89,16 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), "foo/{1}/bar", null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/foo/45/bar");
@@ -105,15 +109,17 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), null, null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Country))).Returns("countries");
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/cities");
@@ -124,15 +130,17 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), null, null);
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
-            mockModelManager.Setup(m => m.GetResourceTypeNameForType(typeof(Country))).Returns("countries");
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/cities");
@@ -143,14 +151,16 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), null, "bar/{1}/qux");
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/bar/45/qux");
@@ -161,14 +171,16 @@ namespace JSONAPI.Tests.Payload
         {
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
-            var relationshipProperty = new ToManyRelationshipModelProperty(typeof(Country).GetProperty("Cities"),
+            var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
                 "cities", false, typeof(City), null, "bar/{1}/qux");
-            var mockModelManager = new Mock<IModelManager>(MockBehavior.Strict);
-            mockModelManager.Setup(m => m.GetIdProperty(typeof(Country))).Returns(typeof(Country).GetProperty("Id"));
+            var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
+            mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
             var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockModelManager.Object, relationshipProperty);
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/bar/45/qux");

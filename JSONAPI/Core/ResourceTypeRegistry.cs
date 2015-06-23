@@ -6,108 +6,67 @@ using System.Linq;
 using System.Reflection;
 using JSONAPI.Extensions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace JSONAPI.Core
 {
-    public class ModelManager : IModelManager
+    /// <summary>
+    /// Default implementation of IModelRegistry
+    /// </summary>
+    public class ResourceTypeRegistry : IResourceTypeRegistry
     {
-        public ModelManager(IPluralizationService pluralizationService)
+        private readonly IPluralizationService _pluralizationService;
+
+        /// <summary>
+        /// Creates a new ModelManager
+        /// </summary>
+        /// <param name="pluralizationService"></param>
+        public ResourceTypeRegistry(IPluralizationService pluralizationService)
         {
             _pluralizationService = pluralizationService;
-            RegistrationsByName = new Dictionary<string, TypeRegistration>();
-            RegistrationsByType = new Dictionary<Type, TypeRegistration>();
+            RegistrationsByName = new Dictionary<string, ResourceTypeRegistration>();
+            RegistrationsByType = new Dictionary<Type, ResourceTypeRegistration>();
         }
-
-        protected IPluralizationService _pluralizationService = null;
-        public IPluralizationService PluralizationService
-        {
-            get
-            {
-                return _pluralizationService;
-            }
-        }
-
-        #region Cache storage
 
         /// <summary>
         /// Represents a type's registration with a model manager
         /// </summary>
-        protected sealed class TypeRegistration
+        protected sealed class ResourceTypeRegistration : IResourceTypeRegistration
         {
-            internal TypeRegistration() { }
+            private readonly IReadOnlyDictionary<string, ResourceTypeField> _fields;
 
-            /// <summary>
-            /// The type that has been registered
-            /// </summary>
-            public Type Type { get; internal set; }
-
-            /// <summary>
-            /// The serialized format of the type's name
-            /// </summary>
-            public string ResourceTypeName { get; internal set; }
-
-            /// <summary>
-            /// The property to be used as this type's ID.
-            /// </summary>
-            public PropertyInfo IdProperty { get; internal set; }
-
-            /// <summary>
-            /// A resource's properties, keyed by name.
-            /// </summary>
-            public IReadOnlyDictionary<string, ModelProperty> Properties { get; internal set; }
-        }
-
-        protected readonly IDictionary<string, TypeRegistration> RegistrationsByName;
-        protected readonly IDictionary<Type, TypeRegistration> RegistrationsByType; 
-
-        protected Lazy<Dictionary<Type, bool>> _isSerializedAsMany
-            = new Lazy<Dictionary<Type, bool>>(
-                () => new Dictionary<Type, bool>()
-            );
-
-        protected Lazy<Dictionary<Type, Type>> _getElementType
-            = new Lazy<Dictionary<Type, Type>>(
-                () => new Dictionary<Type, Type>()
-            );
-
-        #endregion
-
-        public PropertyInfo GetIdProperty(Type type)
-        {
-            return GetRegistrationByType(type).IdProperty;
-        }
-
-        public ModelProperty[] GetProperties(Type type)
-        {
-            var typeRegistration = GetRegistrationByType(type);
-            return typeRegistration.Properties.Values.ToArray();
-        }
-
-        public ModelProperty GetPropertyForJsonKey(Type type, string jsonKey)
-        {
-            var typeRegistration = GetRegistrationByType(type);
-            ModelProperty property;
-            return (typeRegistration.Properties.TryGetValue(jsonKey, out property)) ? property : null;
-        }
-
-        public string GetResourceTypeNameForType(Type type)
-        {
-            return GetRegistrationByType(type).ResourceTypeName;
-        }
-
-        public Type GetTypeByResourceTypeName(string resourceTypeName)
-        {
-            lock (RegistrationsByName)
+            internal ResourceTypeRegistration(Type type, PropertyInfo idProperty, string resourceTypeName, IDictionary<string, ResourceTypeField> fields)
             {
-                TypeRegistration typeRegistration;
-                if (RegistrationsByName.TryGetValue(resourceTypeName, out typeRegistration))
-                    return typeRegistration.Type;
+                IdProperty = idProperty;
+                Type = type;
+                ResourceTypeName = resourceTypeName;
+                Attributes = fields.Values.OfType<ResourceTypeAttribute>().ToArray();
+                Relationships = fields.Values.OfType<ResourceTypeRelationship>().ToArray();
+                _fields = new ReadOnlyDictionary<string, ResourceTypeField>(fields);
+            }
 
-                throw new InvalidOperationException(String.Format("The resource type name `{0}` was not registered.",
-                    resourceTypeName));
+            public Type Type { get; private set; }
+
+            public PropertyInfo IdProperty { get; private set; }
+
+            public string ResourceTypeName { get; private set; }
+
+            public ResourceTypeAttribute[] Attributes { get; private set; }
+
+            public ResourceTypeRelationship[] Relationships { get; private set; }
+
+            public string GetIdForResource(object resource)
+            {
+                return IdProperty.GetValue(resource).ToString();
+            }
+
+            public ResourceTypeField GetFieldByName(string name)
+            {
+                return _fields.ContainsKey(name) ? _fields[name] : null;
             }
         }
+
+        protected readonly IDictionary<string, ResourceTypeRegistration> RegistrationsByName;
+        protected readonly IDictionary<Type, ResourceTypeRegistration> RegistrationsByType; 
 
         public bool TypeIsRegistered(Type type)
         {
@@ -115,17 +74,35 @@ namespace JSONAPI.Core
             return registration != null;
         }
 
-        private TypeRegistration FindRegistrationForType(Type type)
+        public IResourceTypeRegistration GetRegistrationForType(Type type)
+        {
+            var reg = FindRegistrationForType(type);
+            if (reg == null)
+                throw new TypeRegistrationNotFoundException(type);
+
+            return reg;
+        }
+
+        public IResourceTypeRegistration GetRegistrationForResourceTypeName(string resourceTypeName)
+        {
+            lock (RegistrationsByName)
+            {
+                ResourceTypeRegistration registration;
+                if (!RegistrationsByName.TryGetValue(resourceTypeName, out registration))
+                    throw new TypeRegistrationNotFoundException(resourceTypeName);
+
+                return registration;
+            }
+        }
+
+        private ResourceTypeRegistration FindRegistrationForType(Type type)
         {
             lock (RegistrationsByType)
             {
-                if (IsSerializedAsMany(type))
-                    type = GetElementType(type);
-
                 var currentType = type;
                 while (currentType != null && currentType != typeof(Object))
                 {
-                    TypeRegistration registration;
+                    ResourceTypeRegistration registration;
                     if (RegistrationsByType.TryGetValue(currentType, out registration))
                         return registration;
 
@@ -137,19 +114,11 @@ namespace JSONAPI.Core
             return null;
         }
 
-        private TypeRegistration GetRegistrationByType(Type type)
-        {
-            var registration = FindRegistrationForType(type);
-            if (registration != null) return registration;
-
-            throw new InvalidOperationException(String.Format("The type `{0}` was not registered.", type.FullName));
-        }
-
         /// <summary>
         /// Registers a type with this ModelManager.
         /// </summary>
         /// <param name="type">The type to register.</param>
-        public ModelManager RegisterResourceType(Type type)
+        public ResourceTypeRegistry RegisterResourceType(Type type)
         {
             var resourceTypeName = CalculateResourceTypeNameForType(type);
             return RegisterResourceType(type, resourceTypeName);
@@ -160,7 +129,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="type">The type to register.</param>
         /// <param name="resourceTypeName">The resource type name to use</param>
-        public ModelManager RegisterResourceType(Type type, string resourceTypeName)
+        public ResourceTypeRegistry RegisterResourceType(Type type, string resourceTypeName)
         {
             lock (RegistrationsByType)
             {
@@ -174,37 +143,28 @@ namespace JSONAPI.Core
                         throw new InvalidOperationException(
                             String.Format("The resource type name `{0}` has already been registered.", resourceTypeName));
 
-                    var registration = new TypeRegistration
-                    {
-                        Type = type,
-                        ResourceTypeName = resourceTypeName
-                    };
-
-                    var propertyMap = new Dictionary<string, ModelProperty>();
+                    var fieldMap = new Dictionary<string, ResourceTypeField>();
 
                     var idProperty = CalculateIdProperty(type);
                     if (idProperty == null)
                         throw new InvalidOperationException(String.Format(
                             "Unable to determine Id property for type `{0}`.", resourceTypeName));
 
-                    registration.IdProperty = idProperty;
-
                     var props = type.GetProperties();
                     foreach (var prop in props)
                     {
-                        var jsonKey = prop == registration.IdProperty
+                        var jsonKey = prop == idProperty
                             ? "id"
                             : CalculateJsonKeyForProperty(prop);
-                        if (propertyMap.ContainsKey(jsonKey))
+                        if (fieldMap.ContainsKey(jsonKey))
                             throw new InvalidOperationException(
                                 String.Format("The type `{0}` already contains a property keyed at `{1}`.",
                                     resourceTypeName, jsonKey));
-                        var property = CreateModelProperty(prop, jsonKey);
-                        propertyMap[jsonKey] = property;
+                        var property = CreateResourceTypeField(prop, jsonKey);
+                        fieldMap[jsonKey] = property;
                     }
 
-                    registration.Properties = new ReadOnlyDictionary<string, ModelProperty>(propertyMap);
-
+                    var registration = new ResourceTypeRegistration(type, idProperty, resourceTypeName, fieldMap);
 
                     RegistrationsByType.Add(type, registration);
                     RegistrationsByName.Add(resourceTypeName, registration);
@@ -215,19 +175,19 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Creates a cacheable model property representation from a PropertyInfo
+        /// Creates a cacheable model field representation from a PropertyInfo
         /// </summary>
         /// <param name="prop">The property</param>
         /// <param name="jsonKey">The key that this model property will be serialized as</param>
-        /// <returns>A model property represenation</returns>
-        protected virtual ModelProperty CreateModelProperty(PropertyInfo prop, string jsonKey)
+        /// <returns>A model field represenation</returns>
+        protected virtual ResourceTypeField CreateResourceTypeField(PropertyInfo prop, string jsonKey)
         {
             var type = prop.PropertyType;
             var ignoreByDefault =
                 prop.CustomAttributes.Any(c => c.AttributeType == typeof(JsonIgnoreAttribute));
 
             if (prop.PropertyType.CanWriteAsJsonApiAttribute())
-                return new FieldModelProperty(prop, jsonKey, ignoreByDefault);
+                return new ResourceTypeAttribute(prop, jsonKey, ignoreByDefault);
 
             var selfLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelationshipLinkTemplate>().FirstOrDefault();
             var selfLinkTemplate = selfLinkTemplateAttribute == null ? null : selfLinkTemplateAttribute.TemplateString;
@@ -238,9 +198,9 @@ namespace JSONAPI.Core
                 type.IsArray ||
                 (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
 
-            if (!isToMany) return new ToOneRelationshipModelProperty(prop, jsonKey, ignoreByDefault, type, selfLinkTemplate, relatedResourceLinkTemplate);
+            if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, ignoreByDefault, type, selfLinkTemplate, relatedResourceLinkTemplate);
             var relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
-            return new ToManyRelationshipModelProperty(prop, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
+            return new ToManyResourceTypeRelationship(prop, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
         }
 
         /// <summary>
@@ -250,7 +210,7 @@ namespace JSONAPI.Core
         /// <returns>The type's resource type name</returns>
         protected virtual string CalculateResourceTypeNameForType(Type type)
         {
-
+            // TODO: use conventions
             var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
 
             string title = type.Name;
@@ -261,7 +221,7 @@ namespace JSONAPI.Core
                 if (titles.Any()) title = titles.First();
             }
 
-            return FormatPropertyName(PluralizationService.Pluralize(title)).Dasherize();
+            return FormatPropertyName(_pluralizationService.Pluralize(title)).Dasherize();
         }
 
         /// <summary>
@@ -271,6 +231,7 @@ namespace JSONAPI.Core
         /// <returns>The key to serialize the given property as</returns>
         protected internal virtual string CalculateJsonKeyForProperty(PropertyInfo propInfo)
         {
+            // TODO: use conventions
             var jsonPropertyAttribute = (JsonPropertyAttribute)propInfo.GetCustomAttributes(typeof (JsonPropertyAttribute)).FirstOrDefault();
             return jsonPropertyAttribute != null ? jsonPropertyAttribute.PropertyName : FormatPropertyName(propInfo.Name);
         }
@@ -279,47 +240,6 @@ namespace JSONAPI.Core
         {
             string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
             return result;
-        }
-
-        public bool IsSerializedAsMany(Type type)
-        {
-            bool isMany;
-
-            var isManyCache = _isSerializedAsMany.Value;
-
-            lock (isManyCache)
-            {
-                if (isManyCache.TryGetValue(type, out isMany)) return isMany;
-
-                isMany =
-                    type.IsArray ||
-                    (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
-
-                isManyCache.Add(type, isMany);
-            }
-
-            return isMany;
-        }
-
-        public Type GetElementType(Type manyType)
-        {
-            Type etype = null;
-
-            var etypeCache = _getElementType.Value;
-
-            lock (etypeCache)
-            {
-                if (etypeCache.TryGetValue(manyType, out etype)) return etype;
-
-                if (manyType.IsGenericType)
-                    etype = manyType.GetGenericArguments()[0];
-                else
-                    etype = manyType.GetElementType();
-
-                etypeCache.Add(manyType, etype);
-            }
-
-            return etype;
         }
 
         /// <summary>

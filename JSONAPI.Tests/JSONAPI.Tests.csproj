@@ -85,7 +85,7 @@
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
-    <Compile Include="Core\ModelManagerTests.cs" />
+    <Compile Include="Core\ResourceTypeRegistryTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
@@ -98,7 +98,7 @@
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
     <Compile Include="Payload\Builders\FallbackPayloadBuilderTests.cs" />
-    <Compile Include="Payload\Builders\ManagedModelSingleResourcePayloadBuilderTests.cs" />
+    <Compile Include="Payload\Builders\RegistryDrivenSingleResourcePayloadBuilderTests.cs" />
     <Compile Include="Payload\DefaultLinkConventionsTests.cs" />
     <Compile Include="Payload\ErrorPayloadBuilderTests.cs" />
     <Compile Include="Payload\JsonApiSerializerTestsBase.cs" />

@@ -15,16 +15,18 @@ namespace JSONAPI.Core
     /// </summary>
     public class JsonApiConfiguration
     {
-        private readonly IModelManager _modelManager;
+        private readonly IResourceTypeRegistry _resourceTypeRegistry;
+        private readonly ILinkConventions _linkConventions;
 
         /// <summary>
         /// Creates a new configuration
         /// </summary>
-        public JsonApiConfiguration(IModelManager modelManager)
+        public JsonApiConfiguration(IResourceTypeRegistry resourceTypeRegistry, ILinkConventions linkConventions)
         {
-            if (modelManager == null) throw new Exception("You must provide a model manager to begin configuration.");
+            if (resourceTypeRegistry == null) throw new Exception("You must provide a model manager to begin configuration.");
 
-            _modelManager = modelManager;
+            _resourceTypeRegistry = resourceTypeRegistry;
+            _linkConventions = linkConventions;
         }
 
         /// <summary>
@@ -47,8 +49,10 @@ namespace JSONAPI.Core
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(formatter);
 
-            var fallbackPayloadBuilder = new FallbackPayloadBuilder();
+            var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, _linkConventions);
+            var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry);
             var errorPayloadBuilder = new ErrorPayloadBuilder();
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(_resourceTypeRegistry, errorPayloadBuilder, singleResourcePayloadBuilder, resourceCollectionPayloadBuilder);
             httpConfig.Filters.Add(new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder, errorPayloadSerializer));
 
             httpConfig.Services.Replace(typeof(IHttpControllerSelector),

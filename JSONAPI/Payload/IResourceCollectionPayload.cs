@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface for JSON API payloads that represent a collection of resources
     /// </summary>
-    public interface IResourceCollectionPayload
+    public interface IResourceCollectionPayload : IJsonApiPayload
     {
         /// <summary>
         /// The payload's primary data
@@ -14,10 +14,5 @@
         /// Data related to the primary data
         /// </summary>
         IResourceObject[] RelatedData { get; }
-
-        /// <summary>
-        /// Metadata for the payload as a whole
-        /// </summary>
-        IMetadata Metadata { get; }
     }
 }
