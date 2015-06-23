@@ -29,10 +29,15 @@ namespace JSONAPI.Tests.Payload.Builders
             var objectContent = new Fruit();
 
             var mockResourceTypeRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
-            mockResourceTypeRegistry.Setup(m => m.GetRegistrationForType(typeof (Fruit)))
-                .Throws(new TypeRegistrationNotFoundException(typeof (Fruit)));
+            mockResourceTypeRegistry.Setup(m => m.TypeIsRegistered(typeof (Fruit))).Returns(false);
+
+            var mockPayload = new Mock<IErrorPayload>(MockBehavior.Strict);
 
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
+            mockErrorPayloadBuilder
+                .Setup(b => b.BuildFromException(It.IsAny<TypeRegistrationNotFoundException>()))
+                .Returns(mockPayload.Object);
+
             var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
 
@@ -42,14 +47,7 @@ namespace JSONAPI.Tests.Payload.Builders
             var resultPayload = fallbackPayloadBuilder.BuildPayload(objectContent, null);
 
             // Assert
-            resultPayload.Should().BeOfType<IErrorPayload>();
-            ((IErrorPayload) resultPayload).Errors.Length.Should().Be(1);
-
-            var error = ((IErrorPayload) resultPayload).Errors.First();
-            error.Id.Should().MatchRegex(GuidRegex);
-            error.Title.Should().Be("Unable to serialize object content");
-            error.Detail.Should()
-                .Be("FallbackPayloadBuilder encountered object content of type \"Fruit\", but it cannot serialize this type because it has not been registered with the model manager.");
+            resultPayload.Should().BeSameAs(mockPayload.Object);
         }
     }
 }

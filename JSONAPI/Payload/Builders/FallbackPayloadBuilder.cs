@@ -44,10 +44,10 @@ namespace JSONAPI.Payload.Builders
                 isCollection = true;
             }
 
-            IResourceTypeRegistration resourceTypeRegistration;
             try
             {
-                resourceTypeRegistration = _resourceTypeRegistry.GetRegistrationForType(type);
+                if (!_resourceTypeRegistry.TypeIsRegistered(type))
+                    throw new TypeRegistrationNotFoundException(type);
             }
             catch (TypeRegistrationNotFoundException ex)
             {
