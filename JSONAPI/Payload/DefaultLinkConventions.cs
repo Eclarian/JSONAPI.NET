@@ -47,13 +47,13 @@ namespace JSONAPI.Payload
         /// <param name="relationshipOwner"></param>
         /// <param name="modelManager"></param>
         /// <param name="property"></param>
-        /// <typeparam name="TResource"></typeparam>
         /// <returns></returns>
-        protected virtual string BuildRelationshipUrl<TResource>(TResource relationshipOwner, IModelManager modelManager,
+        protected virtual string BuildRelationshipUrl(object relationshipOwner, IModelManager modelManager,
             RelationshipModelProperty property)
         {
+            var relationshipOwnerType = relationshipOwner.GetType();
             var sanitizedBaseUrl = GetSanitizedBaseUrl();
-            var idProp = modelManager.GetIdProperty(typeof(TResource));
+            var idProp = modelManager.GetIdProperty(relationshipOwner.GetType());
             var idPropValue = idProp.GetValue(relationshipOwner).ToString();
             if (property.SelfLinkTemplate != null)
             {
@@ -61,7 +61,7 @@ namespace JSONAPI.Payload
                 return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
             }
 
-            var resourceTypeName = modelManager.GetResourceTypeNameForType(typeof(TResource));
+            var resourceTypeName = modelManager.GetResourceTypeNameForType(relationshipOwnerType);
             return String.Format("{0}/{1}/{2}/relationships/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
         }
 
@@ -80,13 +80,13 @@ namespace JSONAPI.Payload
         /// <param name="relationshipOwner"></param>
         /// <param name="modelManager"></param>
         /// <param name="property"></param>
-        /// <typeparam name="TResource"></typeparam>
         /// <returns></returns>
-        protected virtual string BuildRelatedResourceUrl<TResource>(TResource relationshipOwner, IModelManager modelManager,
+        protected virtual string BuildRelatedResourceUrl(object relationshipOwner, IModelManager modelManager,
             RelationshipModelProperty property)
         {
+            var relationshipOwnerType = relationshipOwner.GetType();
             var sanitizedBaseUrl = GetSanitizedBaseUrl();
-            var idProp = modelManager.GetIdProperty(typeof(TResource));
+            var idProp = modelManager.GetIdProperty(relationshipOwnerType);
             var idPropValue = idProp.GetValue(relationshipOwner).ToString();
             if (property.RelatedResourceLinkTemplate != null)
             {
@@ -94,7 +94,7 @@ namespace JSONAPI.Payload
                 return String.Format("{0}/{1}", sanitizedBaseUrl, replacedString);
             }
 
-            var resourceTypeName = modelManager.GetResourceTypeNameForType(typeof(TResource));
+            var resourceTypeName = modelManager.GetResourceTypeNameForType(relationshipOwnerType);
             return String.Format("{0}/{1}/{2}/{3}", sanitizedBaseUrl, resourceTypeName, idPropValue, property.JsonKey);
         }
 
