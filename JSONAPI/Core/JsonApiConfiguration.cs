@@ -78,7 +78,6 @@ namespace JSONAPI.Core
             var queryablePayloadBuilder = _payloadBuilderFactory();
             var errorPayloadBuilder = new ErrorPayloadBuilder();
             httpConfig.Filters.Add(new FallbackPayloadBuilderAttribute(errorPayloadBuilder, errorPayloadSerializer));
-            httpConfig.Filters.Add(new JsonApiQueryableAttribute(queryablePayloadBuilder));
 
             httpConfig.Services.Replace(typeof(IHttpControllerSelector),
                 new PascalizedControllerSelector(httpConfig));

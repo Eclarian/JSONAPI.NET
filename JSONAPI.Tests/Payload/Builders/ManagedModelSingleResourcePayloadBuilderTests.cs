@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using JSONAPI.Core;
 using JSONAPI.Payload;
+using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
 
-namespace JSONAPI.Tests.Payload
+namespace JSONAPI.Tests.Payload.Builders
 {
     [TestClass]
     public class ManagedModelSingleResourcePayloadBuilderTests

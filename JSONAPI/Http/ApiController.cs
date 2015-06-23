@@ -53,29 +53,18 @@ namespace JSONAPI.Http
             return es;
         }
 
-        public virtual async Task<IEnumerable<T>> Get(string id)
+        /// <summary>
+        /// Gets a single resource matching the ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<IHttpActionResult> Get(string id)
         {
             IMaterializer materializer = MaterializerFactory();
 
-            List<T> results = new List<T>();
-            string[] arrIds;
-            if (id.Contains(","))
-            {
-                 arrIds = id.Split(',');
-            }
-            else
-            {
-                arrIds = new string[] { id };
-            }
-            foreach (string singleid in arrIds)
-            {
-                T hit = await materializer.GetByIdAsync<T>(singleid);
-                if (hit != null)
-                {
-                    results.Add(hit);
-                }
-            }
-            return results;
+            T hit = await materializer.GetByIdAsync<T>(id);
+            if (hit == null) return NotFound();
+            return Ok(hit);
         }
 
         /// <summary>

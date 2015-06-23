@@ -13,16 +13,20 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class FallbackPayloadBuilderAttribute : ActionFilterAttribute
     {
+        private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
         private readonly IErrorPayloadBuilder _errorPayloadBuilder;
         private readonly IErrorPayloadSerializer _errorPayloadSerializer;
 
         /// <summary>
         /// Creates a FallbackPayloadBuilderAttribute
         /// </summary>
+        /// <param name="singleResourcePayloadBuilder"></param>
         /// <param name="errorPayloadBuilder"></param>
         /// <param name="errorPayloadSerializer"></param>
-        public FallbackPayloadBuilderAttribute(IErrorPayloadBuilder errorPayloadBuilder, IErrorPayloadSerializer errorPayloadSerializer)
+        public FallbackPayloadBuilderAttribute(ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+            IErrorPayloadBuilder errorPayloadBuilder, IErrorPayloadSerializer errorPayloadSerializer)
         {
+            _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
             _errorPayloadBuilder = errorPayloadBuilder;
             _errorPayloadSerializer = errorPayloadSerializer;
         }

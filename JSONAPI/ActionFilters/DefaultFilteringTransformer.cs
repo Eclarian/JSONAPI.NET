@@ -94,7 +94,7 @@ namespace JSONAPI.ActionFilters
                     expr = GetPredicateBodyForField(fieldModelProperty, queryValue, param);
 
                 // See if it is a relationship property
-                var relationshipModelProperty = modelProperty as ToManyRelationshipModelProperty;
+                var relationshipModelProperty = modelProperty as RelationshipModelProperty;
                 if (relationshipModelProperty != null)
                     expr = GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
 
@@ -331,7 +331,7 @@ namespace JSONAPI.ActionFilters
             return expr;
         }
 
-        private Expression GetPredicateBodyForRelationship(ToManyRelationshipModelProperty modelProperty, string queryValue, ParameterExpression param)
+        private Expression GetPredicateBodyForRelationship(RelationshipModelProperty modelProperty, string queryValue, ParameterExpression param)
         {
             var relatedType = modelProperty.RelatedType;
             PropertyInfo relatedIdProperty;

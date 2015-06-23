@@ -3,7 +3,7 @@ using System.Linq;
 using JSONAPI.Core;
 using Newtonsoft.Json.Linq;
 
-namespace JSONAPI.Payload
+namespace JSONAPI.Payload.Builders
 {
     /// <summary>
     /// Builds a payload for a model that is managed by a model manager
