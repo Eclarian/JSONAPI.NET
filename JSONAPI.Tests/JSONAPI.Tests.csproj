@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionFilters\DefaultPaginationTransformerTests.cs" />
+    <Compile Include="ActionFilters\FallbackPayloadBuilderAttributeTests.cs" />
     <Compile Include="ActionFilters\QueryableTransformerTestsBase.cs" />
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />

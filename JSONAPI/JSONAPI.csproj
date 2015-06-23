@@ -69,6 +69,7 @@
     <Compile Include="ActionFilters\DefaultFilteringTransformer.cs" />
     <Compile Include="ActionFilters\DefaultPaginationTransformer.cs" />
     <Compile Include="ActionFilters\DefaultPaginationTransformResult.cs" />
+    <Compile Include="ActionFilters\FallbackPayloadBuilderAttribute.cs" />
     <Compile Include="ActionFilters\IQueryableEnumerationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
     <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />
@@ -98,10 +99,13 @@
     <Compile Include="Http\PascalizedControllerSelector.cs" />
     <Compile Include="Payload\DefaultLinkConventions.cs" />
     <Compile Include="Payload\DefaultQueryablePayloadBuilder.cs" />
+    <Compile Include="Payload\Error.cs" />
     <Compile Include="Payload\ErrorPayload.cs" />
+    <Compile Include="Payload\ErrorPayloadBuilder.cs" />
     <Compile Include="Payload\ErrorSerializer.cs" />
     <Compile Include="Payload\IError.cs" />
     <Compile Include="Payload\IErrorPayload.cs" />
+    <Compile Include="Payload\IErrorPayloadBuilder.cs" />
     <Compile Include="Payload\IErrorPayloadSerializer.cs" />
     <Compile Include="Payload\IErrorSerializer.cs" />
     <Compile Include="Payload\IJsonApiSerializer.cs" />

@@ -64,7 +64,9 @@ namespace JSONAPI.Json
             }
             else
             {
-                // TODO: use a payload builder to get a payload
+                // The FallbackPayloadBuilderAttribute should have converted anything to one of the above payload types. If not, then there is
+                // an error in this library. Render an error here.
+                // TODO: Format a raw error here.
                 throw new NotImplementedException();
             }
 
