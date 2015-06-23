@@ -28,16 +28,24 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             return TestHelpers.GetEffortConnection(@"Acceptance\Data");
         }
 
-        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode)
+        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode, bool redactErrorData = false)
         {
             var responseContent = await response.Content.ReadAsStringAsync();
 
             var expectedResponse =
                 JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-            var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
-            redactedResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+            string actualResponse;
+            if (redactErrorData)
+            {
+                var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
+                actualResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+            }
+            else
+            {
+                actualResponse = responseContent;
+            }
 
-            redactedResponse.Should().Be(expectedResponse);
+            actualResponse.Should().Be(expectedResponse);
             response.Content.Headers.ContentType.MediaType.Should().Be(JsonApiContentType);
             response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
 

@@ -15,8 +15,23 @@ namespace JSONAPI.Payload
         public ExceptionErrorMetadata(Exception exception)
         {
             MetaObject = new JObject();
-            MetaObject["exceptionMessage"] = exception.Message;
-            MetaObject["stackTrace"] = exception.StackTrace;
+
+            var currentObject = MetaObject;
+            var currentException = exception;
+            while (currentException != null)
+            {
+                currentObject["exceptionMessage"] = currentException.Message;
+                currentObject["stackTrace"] = currentException.StackTrace;
+
+                currentException = currentException.InnerException;
+
+                if (currentException != null)
+                {
+                    var innerObject = new JObject();
+                    currentObject["innerException"] = innerObject;
+                    currentObject = innerObject;
+                }
+            }
         }
 
         public JObject MetaObject { get; private set; }
