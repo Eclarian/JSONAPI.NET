@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Core
 {
@@ -30,9 +31,21 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class ResourceTypeAttribute : ResourceTypeField
     {
+        private readonly Func<object, JToken> _valueFactory;
+
         internal ResourceTypeAttribute(PropertyInfo property, string jsonKey)
             : base(property, jsonKey)
         {
+        }
+
+        /// <summary>
+        /// Gets the json-formatted value of this resource
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns></returns>
+        public JToken GetValue(object resource)
+        {
+            throw new NotImplementedException();
         }
     }
 

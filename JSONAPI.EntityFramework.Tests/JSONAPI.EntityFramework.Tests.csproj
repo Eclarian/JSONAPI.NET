@@ -110,6 +110,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceptance\AttributeSerializationTests.cs" />
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\PayloadTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
@@ -177,6 +178,9 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\Get_returns_IResourceCollectionPayload.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

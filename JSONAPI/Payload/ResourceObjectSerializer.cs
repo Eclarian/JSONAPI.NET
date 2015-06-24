@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Payload
 {
@@ -52,7 +54,18 @@ namespace JSONAPI.Payload
                     if (attribute.Value == null)
                         writer.WriteNull();
                     else
+                    {
+                        if (attribute.Value.Type == JTokenType.Integer)
+                        {
+                            var ulongValue = attribute.Value.Value<ulong>();
+                            if (ulongValue > long.MaxValue)
+                            {
+                                writer.WriteRawValue(ulongValue.ToString());
+                                continue;
+                            }
+                        }
                         attribute.Value.WriteTo(writer);
+                    }
                 }
                 writer.WriteEndObject();
             }

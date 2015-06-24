@@ -55,9 +55,10 @@ namespace JSONAPI.Payload.Builders
             var attributes = new Dictionary<string, JToken>();
             var relationships = new Dictionary<string, IRelationshipObject>();
 
-            foreach (var modelProperty in resourceTypeRegistration.Attributes)
+            foreach (var attribute in resourceTypeRegistration.Attributes)
             {
-                attributes[modelProperty.JsonKey] = JToken.FromObject(modelProperty.Property.GetValue(modelObject));
+                var propertyValue = attribute.Property.GetValue(modelObject);
+                attributes[attribute.JsonKey] = propertyValue == null ? null : JToken.FromObject(propertyValue);
             }
 
             foreach (var modelRelationship in resourceTypeRegistration.Relationships)

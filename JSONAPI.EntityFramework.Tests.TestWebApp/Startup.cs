@@ -65,6 +65,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
                 .RegisterResourceType(typeof (City))
                 .RegisterResourceType(typeof (Comment))
                 .RegisterResourceType(typeof (Post))
+                .RegisterResourceType(typeof (Sample))
                 .RegisterResourceType(typeof (State))
                 .RegisterResourceType(typeof (Tag))
                 .RegisterResourceType(typeof (User))

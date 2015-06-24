@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using JSONAPI.Core;
 using JSONAPI.Payload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -181,6 +183,34 @@ namespace JSONAPI.Tests.Payload
             mockRelationshipObjectSerializer.Verify(s => s.Serialize(mockNeighbors.Object, It.IsAny<JsonWriter>()), Times.Once);
             mockLinkSerializer.Verify(s => s.Serialize(mockSelfLink.Object, It.IsAny<JsonWriter>()), Times.Once);
             mockMetadataSerializer.Verify(s => s.Serialize(mockMetadata.Object, It.IsAny<JsonWriter>()), Times.Once);
+        }
+
+        class Sample
+        {
+            public string Id { get; set; }
+
+            public UInt64 UInt64Field { get; set; }
+
+            public UInt64? NullableUInt64Field { get; set; }
+        }
+
+        [TestMethod]
+        public async Task Serialize_ResourceObject_for_resource_with_unsigned_long_integer_greater_than_int64_maxvalue()
+        {
+            var attributes = new Dictionary<string, JToken>
+            {
+                { "uInt64Field", 9223372036854775808 },
+                { "nullableUInt64Field", 9223372036854775808 }
+            };
+
+            var resourceObject = new Mock<IResourceObject>();
+            resourceObject.Setup(o => o.Id).Returns("2010");
+            resourceObject.Setup(o => o.Type).Returns("samples");
+            resourceObject.Setup(o => o.Attributes).Returns(attributes);
+            resourceObject.Setup(o => o.Relationships).Returns(new Dictionary<string, IRelationshipObject>());
+
+            var serializer = new ResourceObjectSerializer(null, null, null);
+            await AssertSerializeOutput(serializer, resourceObject.Object, "Payload/Fixtures/Serialize_ResourceObject_for_resource_with_unsigned_long_integer_greater_than_int64_maxvalue.json");
         }
     }
 }

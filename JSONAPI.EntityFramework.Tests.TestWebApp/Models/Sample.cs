@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace JSONAPI.Tests.Models
+namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 {
-    enum SampleEnum
+    public enum SampleEnum
     {
         Value1 = 1,
         Value2 = 2
     }
 
-    class Sample
+    public class Sample
     {
         public string Id { get; set; }
         public Boolean BooleanField { get; set; }

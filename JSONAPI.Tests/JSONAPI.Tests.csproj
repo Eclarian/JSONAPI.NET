@@ -85,6 +85,7 @@
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
+    <Compile Include="Core\ResourceTypeFieldTests.cs" />
     <Compile Include="Core\ResourceTypeRegistryTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Tag.cs" />
-    <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
     <Compile Include="Payload\Builders\FallbackPayloadBuilderTests.cs" />
@@ -164,9 +164,6 @@
     <None Include="Data\NonStandardIdTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\AttributeSerializationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Data\SerializerIntegrationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -204,6 +201,7 @@
     <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_all_possible_members.json" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_primary_data_only_and_metadata.json" />
     <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceCollectionPayload_for_primary_data_only.json" />
+    <EmbeddedResource Include="Payload\Fixtures\Serialize_ResourceObject_for_resource_with_unsigned_long_integer_greater_than_int64_maxvalue.json" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
