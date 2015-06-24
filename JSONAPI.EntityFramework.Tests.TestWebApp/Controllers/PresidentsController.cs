@@ -12,7 +12,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class PresidentsController : ApiController
     {
-        // This endpoint exists to demonstrate returning IPayload
+        // This endpoint exists to demonstrate returning IResourceCollectionPayload
         [Route("presidents")]
         public IHttpActionResult GetPresidents()
         {
@@ -32,7 +32,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
                 }
             };
             
-            var userResources = users.Select(u => new ResourceObject("users", u.Id, null)).ToArray();
+            var userResources = users.Select(u => (IResourceObject)new ResourceObject("users", u.Id)).ToArray();
 
             var payload = new ResourceCollectionPayload(userResources, null, null);
             return Ok(payload);

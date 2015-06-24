@@ -177,7 +177,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PatchWithArrayForToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\GetReturnsIPayloadResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\Get_returns_IResourceCollectionPayload.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\LinkSerialization\Responses\GetResourceWithRelatedLinkAndMissingToOneRelationshipResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\LinkSerialization\Responses\GetResourceWithRelatedLinkAndPresentToOneRelationshipResponse.json" />
     <None Include="App.Config">
