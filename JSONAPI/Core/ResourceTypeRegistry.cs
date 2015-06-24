@@ -10,19 +10,92 @@ using Newtonsoft.Json;
 namespace JSONAPI.Core
 {
     /// <summary>
-    /// Default implementation of IModelRegistry
+    /// Allows configuring how to calculate JSON API keys based on CLR types and properties
     /// </summary>
-    public class ResourceTypeRegistry : IResourceTypeRegistry
+    public interface INamingConventions
+    {
+        /// <summary>
+        /// Calculates the field name for a given property
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        string GetFieldNameForProperty(PropertyInfo property);
+
+        /// <summary>
+        /// Calculates the resource type name for a CLR type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        string GetResourceTypeNameForType(Type type);
+    }
+
+    /// <summary>
+    /// Default implementation of INamingConventions
+    /// </summary>
+    public class DefaultNamingConventions : INamingConventions
     {
         private readonly IPluralizationService _pluralizationService;
 
         /// <summary>
-        /// Creates a new ModelManager
+        /// Creates a new DefaultNamingConventions
         /// </summary>
         /// <param name="pluralizationService"></param>
-        public ResourceTypeRegistry(IPluralizationService pluralizationService)
+        public DefaultNamingConventions(IPluralizationService pluralizationService)
         {
             _pluralizationService = pluralizationService;
+        }
+
+        /// <summary>
+        /// This method first checks if the property has a [JsonProperty] attribute. If so,
+        /// it uses the attribute's PropertyName. Otherwise, it falls back to taking the
+        /// property's name, and dasherizing it.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public string GetFieldNameForProperty(PropertyInfo property)
+        {
+            var jsonPropertyAttribute = (JsonPropertyAttribute)property.GetCustomAttributes(typeof(JsonPropertyAttribute)).FirstOrDefault();
+            return jsonPropertyAttribute != null ? jsonPropertyAttribute.PropertyName : property.Name.Dasherize();
+        }
+
+        /// <summary>
+        /// This method first checks if the type has a [JsonObject] attribute. If so,
+        /// it uses the attribute's Title. Otherwise it falls back to pluralizing the
+        /// type's name using the given <see cref="IPluralizationService" /> and then
+        /// dasherizing that value.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public string GetResourceTypeNameForType(Type type)
+        {
+            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(JsonObjectAttribute)).ToList();
+
+            string title = type.Name;
+            if (attrs.Any())
+            {
+                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
+                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
+                if (titles.Any()) title = titles.First();
+            }
+
+            return _pluralizationService.Pluralize(title).Dasherize();
+        }
+    }
+
+    /// <summary>
+    /// Default implementation of IModelRegistry
+    /// </summary>
+    public class ResourceTypeRegistry : IResourceTypeRegistry
+    {
+        private readonly INamingConventions _namingConventions;
+
+        /// <summary>
+        /// Creates a new ResourceTypeRegistry
+        /// </summary>
+        /// <param name="namingConventions"></param>
+        public ResourceTypeRegistry(INamingConventions namingConventions)
+        {
+            _namingConventions = namingConventions;
             RegistrationsByName = new Dictionary<string, ResourceTypeRegistration>();
             RegistrationsByType = new Dictionary<Type, ResourceTypeRegistration>();
         }
@@ -120,7 +193,7 @@ namespace JSONAPI.Core
         /// <param name="type">The type to register.</param>
         public ResourceTypeRegistry RegisterResourceType(Type type)
         {
-            var resourceTypeName = CalculateResourceTypeNameForType(type);
+            var resourceTypeName = _namingConventions.GetResourceTypeNameForType(type);
             return RegisterResourceType(type, resourceTypeName);
         }
 
@@ -158,7 +231,7 @@ namespace JSONAPI.Core
                         var ignore = prop.CustomAttributes.Any(c => c.AttributeType == typeof(JsonIgnoreAttribute));
                         if (ignore) continue;
 
-                        var jsonKey = CalculateJsonKeyForProperty(prop);
+                        var jsonKey = _namingConventions.GetFieldNameForProperty(prop);
                         if (jsonKey == "id")
                             throw new InvalidOperationException(
                                 String.Format("Failed to register type `{0}` because it contains a non-id property that would serialize as \"id\".", type.Name));
@@ -210,45 +283,6 @@ namespace JSONAPI.Core
             if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, type, selfLinkTemplate, relatedResourceLinkTemplate);
             var relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
             return new ToManyResourceTypeRelationship(prop, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
-        }
-
-        /// <summary>
-        /// Determines the resource type name for a given type.
-        /// </summary>
-        /// <param name="type">The type to calculate the resouce type name for</param>
-        /// <returns>The type's resource type name</returns>
-        protected virtual string CalculateResourceTypeNameForType(Type type)
-        {
-            // TODO: use conventions
-            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
-
-            string title = type.Name;
-            if (attrs.Any())
-            {
-                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
-                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
-                if (titles.Any()) title = titles.First();
-            }
-
-            return FormatPropertyName(_pluralizationService.Pluralize(title)).Dasherize();
-        }
-
-        /// <summary>
-        /// Determines the key that a property will be serialized as.
-        /// </summary>
-        /// <param name="propInfo">The property</param>
-        /// <returns>The key to serialize the given property as</returns>
-        protected internal virtual string CalculateJsonKeyForProperty(PropertyInfo propInfo)
-        {
-            // TODO: use conventions
-            var jsonPropertyAttribute = (JsonPropertyAttribute)propInfo.GetCustomAttributes(typeof (JsonPropertyAttribute)).FirstOrDefault();
-            return jsonPropertyAttribute != null ? jsonPropertyAttribute.PropertyName : FormatPropertyName(propInfo.Name);
-        }
-
-        private static string FormatPropertyName(string propertyName)
-        {
-            string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
-            return result;
         }
 
         /// <summary>

@@ -33,15 +33,6 @@ namespace JSONAPI.Tests.Core
             
         }
 
-        private class Band
-        {
-            [UseAsId]
-            public string BandName { get; set; }
-
-            [JsonProperty("THE-GENRE")]
-            public string Genre { get; set; }
-        }
-
         private class Salad
         {
             public string Id { get; set; }
@@ -72,10 +63,10 @@ namespace JSONAPI.Tests.Core
         public void Cant_register_type_with_missing_id()
         {
             // Arrange
-            var mm = new ResourceTypeRegistry(new PluralizationService());
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            Action action = () => mm.RegisterResourceType(typeof(InvalidModel));
+            Action action = () => registry.RegisterResourceType(typeof(InvalidModel));
 
             // Assert
             action.ShouldThrow<InvalidOperationException>()
@@ -87,10 +78,10 @@ namespace JSONAPI.Tests.Core
         public void Cant_register_type_with_non_id_property_called_id()
         {
             // Arrange
-            var mm = new ResourceTypeRegistry(new PluralizationService());
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            Action action = () => mm.RegisterResourceType(typeof(Continent));
+            Action action = () => registry.RegisterResourceType(typeof(Continent));
 
             // Assert
             action.ShouldThrow<InvalidOperationException>()
@@ -102,10 +93,10 @@ namespace JSONAPI.Tests.Core
         public void Cant_register_type_with_property_called_type()
         {
             // Arrange
-            var mm = new ResourceTypeRegistry(new PluralizationService());
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            Action action = () => mm.RegisterResourceType(typeof(Boat));
+            Action action = () => registry.RegisterResourceType(typeof(Boat));
 
             // Assert
             action.ShouldThrow<InvalidOperationException>()
@@ -116,12 +107,12 @@ namespace JSONAPI.Tests.Core
         [TestMethod]
         public void Cant_register_type_with_two_properties_with_the_same_name()
         {
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
+            // Arrange
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
             Type saladType = typeof(Salad);
 
             // Act
-            Action action = () => mm.RegisterResourceType(saladType);
+            Action action = () => registry.RegisterResourceType(saladType);
 
             // Assert
             action.ShouldThrow<InvalidOperationException>().Which.Message.Should()
@@ -132,10 +123,9 @@ namespace JSONAPI.Tests.Core
         public void RegisterResourceType_sets_up_registration_correctly()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            var registry = new ResourceTypeRegistry(pluralizationService);
             registry.RegisterResourceType(typeof(Post));
             var postReg = registry.GetRegistrationForType(typeof(Post));
             
@@ -159,18 +149,17 @@ namespace JSONAPI.Tests.Core
         public void GetRegistrationForType_returns_correct_value_for_registered_types()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            mm.RegisterResourceType(typeof(Post));
-            mm.RegisterResourceType(typeof(Author));
-            mm.RegisterResourceType(typeof(Comment));
-            mm.RegisterResourceType(typeof(UserGroup));
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
+            registry.RegisterResourceType(typeof(Post));
+            registry.RegisterResourceType(typeof(Author));
+            registry.RegisterResourceType(typeof(Comment));
+            registry.RegisterResourceType(typeof(UserGroup));
 
             // Act
-            var postReg = mm.GetRegistrationForType(typeof(Post));
-            var authorReg = mm.GetRegistrationForType(typeof(Author));
-            var commentReg = mm.GetRegistrationForType(typeof(Comment));
-            var userGroupReg = mm.GetRegistrationForType(typeof(UserGroup));
+            var postReg = registry.GetRegistrationForType(typeof(Post));
+            var authorReg = registry.GetRegistrationForType(typeof(Author));
+            var commentReg = registry.GetRegistrationForType(typeof(Comment));
+            var userGroupReg = registry.GetRegistrationForType(typeof(UserGroup));
 
             // Assert
             postReg.ResourceTypeName.Should().Be("posts");
@@ -183,12 +172,11 @@ namespace JSONAPI.Tests.Core
         public void GetRegistrationForType_gets_registration_for_closest_registered_base_type_for_unregistered_type()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            mm.RegisterResourceType(typeof(Post));
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
+            registry.RegisterResourceType(typeof(Post));
 
             // Act
-            var registration = mm.GetRegistrationForType(typeof(DerivedPost));
+            var registration = registry.GetRegistrationForType(typeof(DerivedPost));
 
             // Assert
             registration.Type.Should().Be(typeof(Post));
@@ -198,13 +186,12 @@ namespace JSONAPI.Tests.Core
         public void GetRegistrationForType_fails_when_getting_unregistered_type()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
             Action action = () =>
             {
-                mm.GetRegistrationForType(typeof(Post));
+                registry.GetRegistrationForType(typeof(Post));
             };
 
             // Assert
@@ -215,13 +202,12 @@ namespace JSONAPI.Tests.Core
         public void GetRegistrationForResourceTypeName_fails_when_getting_unregistered_type_name()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
             Action action = () =>
             {
-                mm.GetRegistrationForResourceTypeName("posts");
+                registry.GetRegistrationForResourceTypeName("posts");
             };
 
             // Assert
@@ -232,18 +218,17 @@ namespace JSONAPI.Tests.Core
         public void GetModelRegistrationForResourceTypeName_returns_correct_value_for_registered_names()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            mm.RegisterResourceType(typeof(Post));
-            mm.RegisterResourceType(typeof(Author));
-            mm.RegisterResourceType(typeof(Comment));
-            mm.RegisterResourceType(typeof(UserGroup));
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
+            registry.RegisterResourceType(typeof(Post));
+            registry.RegisterResourceType(typeof(Author));
+            registry.RegisterResourceType(typeof(Comment));
+            registry.RegisterResourceType(typeof(UserGroup));
 
             // Act
-            var postReg = mm.GetRegistrationForResourceTypeName("posts");
-            var authorReg = mm.GetRegistrationForResourceTypeName("authors");
-            var commentReg = mm.GetRegistrationForResourceTypeName("comments");
-            var userGroupReg = mm.GetRegistrationForResourceTypeName("user-groups");
+            var postReg = registry.GetRegistrationForResourceTypeName("posts");
+            var authorReg = registry.GetRegistrationForResourceTypeName("authors");
+            var commentReg = registry.GetRegistrationForResourceTypeName("comments");
+            var userGroupReg = registry.GetRegistrationForResourceTypeName("user-groups");
 
             // Assert
             postReg.Type.Should().Be(typeof (Post));
@@ -256,12 +241,11 @@ namespace JSONAPI.Tests.Core
         public void TypeIsRegistered_returns_true_if_type_is_registered()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            mm.RegisterResourceType(typeof (Post));
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
+            registry.RegisterResourceType(typeof (Post));
 
             // Act
-            var isRegistered = mm.TypeIsRegistered(typeof (Post));
+            var isRegistered = registry.TypeIsRegistered(typeof (Post));
 
             // Assert
             isRegistered.Should().BeTrue();
@@ -271,12 +255,11 @@ namespace JSONAPI.Tests.Core
         public void TypeIsRegistered_returns_true_if_parent_type_is_registered()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            mm.RegisterResourceType(typeof(Post));
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
+            registry.RegisterResourceType(typeof(Post));
 
             // Act
-            var isRegistered = mm.TypeIsRegistered(typeof(DerivedPost));
+            var isRegistered = registry.TypeIsRegistered(typeof(DerivedPost));
 
             // Assert
             isRegistered.Should().BeTrue();
@@ -286,11 +269,10 @@ namespace JSONAPI.Tests.Core
         public void TypeIsRegistered_returns_false_if_no_type_in_hierarchy_is_registered()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            var isRegistered = mm.TypeIsRegistered(typeof(Comment));
+            var isRegistered = registry.TypeIsRegistered(typeof(Comment));
 
             // Assert
             isRegistered.Should().BeFalse();
@@ -300,33 +282,13 @@ namespace JSONAPI.Tests.Core
         public void TypeIsRegistered_returns_false_for_collection_of_unregistered_types()
         {
             // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(new PluralizationService()));
 
             // Act
-            var isRegistered = mm.TypeIsRegistered(typeof(ICollection<Comment>));
+            var isRegistered = registry.TypeIsRegistered(typeof(ICollection<Comment>));
 
             // Assert
             isRegistered.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void GetJsonKeyForPropertyTest()
-        {
-            // Arrange
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-
-            // Act
-            var idKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Id"));
-            var nameKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Name"));
-            var postsKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Posts"));
-
-            // Assert
-            Assert.AreEqual("id", idKey);
-            Assert.AreEqual("name", nameKey);
-            Assert.AreEqual("posts", postsKey);
-
         }
     }
 }

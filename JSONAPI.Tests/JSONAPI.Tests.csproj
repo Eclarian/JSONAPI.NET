@@ -84,6 +84,7 @@
     <Compile Include="ActionFilters\QueryableTransformerTestsBase.cs" />
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
+    <Compile Include="Core\DefaultNamingConventionsTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
     <Compile Include="Core\ResourceTypeFieldTests.cs" />
     <Compile Include="Core\ResourceTypeRegistryTests.cs" />

@@ -19,7 +19,8 @@ namespace JSONAPI.TodoMVC.API
         {
             var pluralizationService = new PluralizationService();
             pluralizationService.AddMapping("todo", "todos");
-            var modelManager = new ResourceTypeRegistry(pluralizationService);
+            var namingConventions = new DefaultNamingConventions(pluralizationService);
+            var modelManager = new ResourceTypeRegistry(namingConventions);
             modelManager.RegisterResourceType(typeof (Todo));
 
             var httpConfig = new HttpConfiguration();

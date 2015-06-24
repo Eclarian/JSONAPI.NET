@@ -61,7 +61,8 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             
             // Configure the model manager
             var pluralizationService = new PluralizationService();
-            var modelManager = new ResourceTypeRegistry(pluralizationService)
+            var namingConventions = new DefaultNamingConventions(pluralizationService);
+            var modelManager = new ResourceTypeRegistry(namingConventions)
                 .RegisterResourceType(typeof (City))
                 .RegisterResourceType(typeof (Comment))
                 .RegisterResourceType(typeof (Post))
