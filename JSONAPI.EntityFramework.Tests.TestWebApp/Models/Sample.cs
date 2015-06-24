@@ -13,22 +13,22 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public string Id { get; set; }
         public Boolean BooleanField { get; set; }
         public Boolean? NullableBooleanField { get; set; }
-        public SByte SByteField { get; set; }
-        public SByte? NullableSByteField { get; set; }
+        public SByte SbyteField { get; set; }
+        public SByte? NullableSbyteField { get; set; }
         public Byte ByteField { get; set; }
         public Byte? NullableByteField { get; set; }
         public Int16 Int16Field { get; set; }
         public Int16? NullableInt16Field { get; set; }
-        public UInt16 UInt16Field { get; set; }
-        public UInt16? NullableUInt16Field { get; set; }
+        public UInt16 Uint16Field { get; set; }
+        public UInt16? NullableUint16Field { get; set; }
         public Int32 Int32Field { get; set; }
         public Int32? NullableInt32Field { get; set; }
-        public UInt32 UInt32Field { get; set; }
-        public UInt32? NullableUInt32Field { get; set; }
+        public UInt32 Uint32Field { get; set; }
+        public UInt32? NullableUint32Field { get; set; }
         public Int64 Int64Field { get; set; }
         public Int64? NullableInt64Field { get; set; }
-        public UInt64 UInt64Field { get; set; }
-        public UInt64? NullableUInt64Field { get; set; }
+        public UInt64 Uint64Field { get; set; }
+        public UInt64? NullableUint64Field { get; set; }
         public Double DoubleField { get; set; }
         public Double? NullableDoubleField { get; set; }
         public Single SingleField { get; set; }

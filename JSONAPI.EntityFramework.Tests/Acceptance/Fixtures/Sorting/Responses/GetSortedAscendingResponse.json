@@ -4,8 +4,8 @@
             "type": "users",
             "id": "401",
             "attributes": {
-                "firstName": "Alice",
-                "lastName": "Smith"
+                "first-name": "Alice",
+                "last-name": "Smith"
             },
             "relationships": {
                 "comments": {
@@ -20,10 +20,10 @@
                         "related": "https://www.example.com/users/401/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/401/relationships/userGroups",
-                        "related": "https://www.example.com/users/401/userGroups"
+                        "self": "https://www.example.com/users/401/relationships/user-groups",
+                        "related": "https://www.example.com/users/401/user-groups"
                     }
                 }
             }
@@ -32,8 +32,8 @@
             "type": "users",
             "id": "402",
             "attributes": {
-                "firstName": "Bob",
-                "lastName": "Jones"
+                "first-name": "Bob",
+                "last-name": "Jones"
             },
             "relationships": {
                 "comments": {
@@ -48,10 +48,10 @@
                         "related": "https://www.example.com/users/402/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/402/relationships/userGroups",
-                        "related": "https://www.example.com/users/402/userGroups"
+                        "self": "https://www.example.com/users/402/relationships/user-groups",
+                        "related": "https://www.example.com/users/402/user-groups"
                     }
                 }
             }
@@ -60,8 +60,8 @@
             "type": "users",
             "id": "403",
             "attributes": {
-                "firstName": "Charlie",
-                "lastName": "Michaels"
+                "first-name": "Charlie",
+                "last-name": "Michaels"
             },
             "relationships": {
                 "comments": {
@@ -76,10 +76,10 @@
                         "related": "https://www.example.com/users/403/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/403/relationships/userGroups",
-                        "related": "https://www.example.com/users/403/userGroups"
+                        "self": "https://www.example.com/users/403/relationships/user-groups",
+                        "related": "https://www.example.com/users/403/user-groups"
                     }
                 }
             }
@@ -88,8 +88,8 @@
             "type": "users",
             "id": "409",
             "attributes": {
-                "firstName": "Charlie",
-                "lastName": "Burns"
+                "first-name": "Charlie",
+                "last-name": "Burns"
             },
             "relationships": {
                 "comments": {
@@ -104,10 +104,10 @@
                         "related": "https://www.example.com/users/409/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/409/relationships/userGroups",
-                        "related": "https://www.example.com/users/409/userGroups"
+                        "self": "https://www.example.com/users/409/relationships/user-groups",
+                        "related": "https://www.example.com/users/409/user-groups"
                     }
                 }
             }
@@ -116,8 +116,8 @@
             "type": "users",
             "id": "406",
             "attributes": {
-                "firstName": "Ed",
-                "lastName": "Burns"
+                "first-name": "Ed",
+                "last-name": "Burns"
             },
             "relationships": {
                 "comments": {
@@ -132,10 +132,10 @@
                         "related": "https://www.example.com/users/406/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/406/relationships/userGroups",
-                        "related": "https://www.example.com/users/406/userGroups"
+                        "self": "https://www.example.com/users/406/relationships/user-groups",
+                        "related": "https://www.example.com/users/406/user-groups"
                     }
                 }
             }
@@ -144,8 +144,8 @@
             "type": "users",
             "id": "405",
             "attributes": {
-                "firstName": "Michelle",
-                "lastName": "Johnson"
+                "first-name": "Michelle",
+                "last-name": "Johnson"
             },
             "relationships": {
                 "comments": {
@@ -160,10 +160,10 @@
                         "related": "https://www.example.com/users/405/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/405/relationships/userGroups",
-                        "related": "https://www.example.com/users/405/userGroups"
+                        "self": "https://www.example.com/users/405/relationships/user-groups",
+                        "related": "https://www.example.com/users/405/user-groups"
                     }
                 }
             }
@@ -172,8 +172,8 @@
             "type": "users",
             "id": "408",
             "attributes": {
-                "firstName": "Pat",
-                "lastName": "Morgan"
+                "first-name": "Pat",
+                "last-name": "Morgan"
             },
             "relationships": {
                 "comments": {
@@ -188,10 +188,10 @@
                         "related": "https://www.example.com/users/408/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/408/relationships/userGroups",
-                        "related": "https://www.example.com/users/408/userGroups"
+                        "self": "https://www.example.com/users/408/relationships/user-groups",
+                        "related": "https://www.example.com/users/408/user-groups"
                     }
                 }
             }
@@ -200,8 +200,8 @@
             "type": "users",
             "id": "404",
             "attributes": {
-                "firstName": "Richard",
-                "lastName": "Smith"
+                "first-name": "Richard",
+                "last-name": "Smith"
             },
             "relationships": {
                 "comments": {
@@ -216,10 +216,10 @@
                         "related": "https://www.example.com/users/404/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/404/relationships/userGroups",
-                        "related": "https://www.example.com/users/404/userGroups"
+                        "self": "https://www.example.com/users/404/relationships/user-groups",
+                        "related": "https://www.example.com/users/404/user-groups"
                     }
                 }
             }
@@ -228,8 +228,8 @@
             "type": "users",
             "id": "410",
             "attributes": {
-                "firstName": "Sally",
-                "lastName": "Burns"
+                "first-name": "Sally",
+                "last-name": "Burns"
             },
             "relationships": {
                 "comments": {
@@ -244,10 +244,10 @@
                         "related": "https://www.example.com/users/410/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/410/relationships/userGroups",
-                        "related": "https://www.example.com/users/410/userGroups"
+                        "self": "https://www.example.com/users/410/relationships/user-groups",
+                        "related": "https://www.example.com/users/410/user-groups"
                     }
                 }
             }
@@ -256,8 +256,8 @@
             "type": "users",
             "id": "407",
             "attributes": {
-                "firstName": "Thomas",
-                "lastName": "Potter"
+                "first-name": "Thomas",
+                "last-name": "Potter"
             },
             "relationships": {
                 "comments": {
@@ -272,10 +272,10 @@
                         "related": "https://www.example.com/users/407/posts"
                     }
                 },
-                "userGroups": { 
+                "user-groups": { 
                     "links": {
-                        "self": "https://www.example.com/users/407/relationships/userGroups",
-                        "related": "https://www.example.com/users/407/userGroups"
+                        "self": "https://www.example.com/users/407/relationships/user-groups",
+                        "related": "https://www.example.com/users/407/user-groups"
                     }
                 }
             }
