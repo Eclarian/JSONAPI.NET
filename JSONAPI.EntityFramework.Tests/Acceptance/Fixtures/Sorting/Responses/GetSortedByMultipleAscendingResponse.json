@@ -8,9 +8,24 @@
                 "lastName": "Burns"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/409/relationships/comments",
+                        "related": "https://www.example.com/users/409/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/409/relationships/posts",
+                        "related": "https://www.example.com/users/409/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/409/relationships/userGroups",
+                        "related": "https://www.example.com/users/409/userGroups"
+                    }
+                }
             }
         },
         {
@@ -21,9 +36,24 @@
                 "lastName": "Burns"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/406/relationships/comments",
+                        "related": "https://www.example.com/users/406/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/406/relationships/posts",
+                        "related": "https://www.example.com/users/406/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/406/relationships/userGroups",
+                        "related": "https://www.example.com/users/406/userGroups"
+                    }
+                }
             }
         },
         {
@@ -34,9 +64,24 @@
                 "lastName": "Burns"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/410/relationships/comments",
+                        "related": "https://www.example.com/users/410/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/410/relationships/posts",
+                        "related": "https://www.example.com/users/410/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/410/relationships/userGroups",
+                        "related": "https://www.example.com/users/410/userGroups"
+                    }
+                }
             }
         },
         {
@@ -47,9 +92,24 @@
                 "lastName": "Johnson"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/405/relationships/comments",
+                        "related": "https://www.example.com/users/405/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/405/relationships/posts",
+                        "related": "https://www.example.com/users/405/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/405/relationships/userGroups",
+                        "related": "https://www.example.com/users/405/userGroups"
+                    }
+                }
             }
         },
         {
@@ -61,16 +121,23 @@
             },
             "relationships": {
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "102" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/users/402/relationships/comments",
+                        "related": "https://www.example.com/users/402/comments"
+                    }
                 },
                 "posts": {
-                    "data": [
-                        { "type": "posts", "id": "204" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/users/402/relationships/posts",
+                        "related": "https://www.example.com/users/402/posts"
+                    }
                 },
-                "userGroups": { "data": [ ] }
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/402/relationships/userGroups",
+                        "related": "https://www.example.com/users/402/userGroups"
+                    }
+                }
             }
         },
         {
@@ -82,14 +149,23 @@
             },
             "relationships": {
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "101" },
-                        { "type": "comments", "id": "103" },
-                        { "type": "comments", "id": "104" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/users/403/relationships/comments",
+                        "related": "https://www.example.com/users/403/comments"
+                    }
                 },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/403/relationships/posts",
+                        "related": "https://www.example.com/users/403/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/403/relationships/userGroups",
+                        "related": "https://www.example.com/users/403/userGroups"
+                    }
+                }
             }
         },
         {
@@ -100,9 +176,24 @@
                 "lastName": "Morgan"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/408/relationships/comments",
+                        "related": "https://www.example.com/users/408/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/408/relationships/posts",
+                        "related": "https://www.example.com/users/408/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/408/relationships/userGroups",
+                        "related": "https://www.example.com/users/408/userGroups"
+                    }
+                }
             }
         },
         {
@@ -113,9 +204,24 @@
                 "lastName": "Potter"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/407/relationships/comments",
+                        "related": "https://www.example.com/users/407/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/407/relationships/posts",
+                        "related": "https://www.example.com/users/407/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/407/relationships/userGroups",
+                        "related": "https://www.example.com/users/407/userGroups"
+                    }
+                }
             }
         },
         {
@@ -127,18 +233,23 @@
             },
             "relationships": {
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "105" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/users/401/relationships/comments",
+                        "related": "https://www.example.com/users/401/comments"
+                    }
                 },
                 "posts": {
-                    "data": [
-                        { "type": "posts", "id": "201" },
-                        { "type": "posts", "id": "202" },
-                        { "type": "posts", "id": "203" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/users/401/relationships/posts",
+                        "related": "https://www.example.com/users/401/posts"
+                    }
                 },
-                "userGroups": { "data": [ ] }
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/401/relationships/userGroups",
+                        "related": "https://www.example.com/users/401/userGroups"
+                    }
+                }
             }
         },
         {
@@ -149,9 +260,24 @@
                 "lastName": "Smith"
             },
             "relationships": {
-                "comments": { "data": [ ] },
-                "posts": { "data": [ ] },
-                "userGroups": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/users/404/relationships/comments",
+                        "related": "https://www.example.com/users/404/comments"
+                    }
+                },
+                "posts": {
+                    "links": {
+                        "self": "https://www.example.com/users/404/relationships/posts",
+                        "related": "https://www.example.com/users/404/posts"
+                    }
+                },
+                "userGroups": { 
+                    "links": {
+                        "self": "https://www.example.com/users/404/relationships/userGroups",
+                        "related": "https://www.example.com/users/404/userGroups"
+                    }
+                }
             }
         }
     ]

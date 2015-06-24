@@ -43,6 +43,8 @@ namespace JSONAPI.ActionFilters
 
             var selectors = new List<Tuple<bool, Expression<Func<T, object>>>>();
             var usedProperties = new Dictionary<PropertyInfo, object>();
+            
+            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
 
             foreach (var sortExpression in sortExpressions)
             {
@@ -58,14 +60,22 @@ namespace JSONAPI.ActionFilters
                 if (string.IsNullOrWhiteSpace(propertyName))
                     throw new QueryableTransformException("The property name is missing.");
 
-                var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
+                PropertyInfo property;
+                if (propertyName == "id")
+                {
+                    property = registration.IdProperty;
+                }
+                else
+                {
+                    var modelProperty = registration.GetFieldByName(propertyName);
+                    if (modelProperty == null)
+                        throw new QueryableTransformException(
+                            string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
+                                propertyName, registration.ResourceTypeName));
 
-                var modelProperty = registration.GetFieldByName(propertyName);
-                if (modelProperty == null)
-                    throw new QueryableTransformException(string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
-                        propertyName, registration.ResourceTypeName));
+                    property = modelProperty.Property;
+                }
 
-                var property = modelProperty.Property;
                 
                 if (usedProperties.ContainsKey(property))
                     throw new QueryableTransformException(string.Format("The attribute \"{0}\" was specified more than once.", propertyName));

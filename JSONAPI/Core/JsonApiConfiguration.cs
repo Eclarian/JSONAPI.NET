@@ -69,7 +69,7 @@ namespace JSONAPI.Core
             httpConfig.Formatters.Add(formatter);
 
             var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, _linkConventions);
-            var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry);
+            var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry, _linkConventions);
             var queryableResourcePayloadBuilder = _queryablePayloadBuilderFactory(resourceCollectionPayloadBuilder);
             var errorPayloadBuilder = new ErrorPayloadBuilder();
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder, queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder);

@@ -161,5 +161,32 @@ namespace JSONAPI.Tests.ActionFilters
             // Assert
             ((ObjectContent) actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
         }
+
+        [TestMethod]
+        public void OnActionExecutedAsync_creates_IErrorPayload_if_fallbackPayloadBuilder_throws_an_exception()
+        {
+            var payload = new Fruit();
+            var actionExecutedContext = GetActionExecutedContext(payload);
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            var exception = new Exception();
+            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
+            mockFallbackPayloadBuilder
+                .Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>(), cancellationTokenSource.Token))
+                .Throws(exception);
+            
+            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
+            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
+            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(exception)).Returns(mockResult.Object);
+            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+
+            // Act
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
+            task.Wait();
+
+            // Assert
+            ((ObjectContent) actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
+        }
     }
 }

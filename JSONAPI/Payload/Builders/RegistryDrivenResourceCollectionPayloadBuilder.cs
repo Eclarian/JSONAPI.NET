@@ -1,27 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JSONAPI.Core;
 
 namespace JSONAPI.Payload.Builders
 {
     /// <summary>
-    /// Builds a payload for a list of models that are managed by a model manager
+    /// Builds a payload for a collection of resources that are registered with a resource type registry
     /// </summary>
-    public class RegistryDrivenResourceCollectionPayloadBuilder : IResourceCollectionPayloadBuilder
+    public class RegistryDrivenResourceCollectionPayloadBuilder : RegistryDrivenPayloadBuilder, IResourceCollectionPayloadBuilder
     {
-        private readonly IResourceTypeRegistry _resourceTypeRegistry;
-
         /// <summary>
-        /// Creates a new ManagedModelResourceCollectionPayloadBuilder.
+        /// Creates a new RegistryDrivenSingleResourcePayloadBuilder
         /// </summary>
-        /// <param name="resourceTypeRegistry"></param>
-        public RegistryDrivenResourceCollectionPayloadBuilder(IResourceTypeRegistry resourceTypeRegistry)
+        /// <param name="resourceTypeRegistry">The resource type registry to use to locate the registered type</param>
+        /// <param name="linkConventions">Conventions to follow when building links</param>
+        public RegistryDrivenResourceCollectionPayloadBuilder(IResourceTypeRegistry resourceTypeRegistry, ILinkConventions linkConventions)
+            : base(resourceTypeRegistry, linkConventions)
         {
-            _resourceTypeRegistry = resourceTypeRegistry;
         }
 
         public IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, params string[] includePathExpressions)
         {
-            throw new System.NotImplementedException();
+            var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
+            var primaryDataResources =
+                primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions))
+                    .ToArray();
+
+            var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
+            var payload = new ResourceCollectionPayload(primaryDataResources, relatedData, null);
+            return payload;
         }
     }
 }

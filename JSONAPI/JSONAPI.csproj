@@ -102,6 +102,7 @@
     <Compile Include="Payload\Builders\FallbackPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\IFallbackPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\IResourceCollectionPayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\RegistryDrivenPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\RegistryDrivenResourceCollectionPayloadBuilder.cs" />
     <Compile Include="Payload\DefaultLinkConventions.cs" />
     <Compile Include="Payload\Builders\DefaultQueryableResourceCollectionPayloadBuilder.cs" />

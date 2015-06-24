@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +58,14 @@ namespace JSONAPI.ActionFilters
                     }
                     else
                     {
-                        payloadValue = await _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request, cancellationToken);
+                        try
+                        {
+                            payloadValue = await _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            payloadValue = _errorPayloadBuilder.BuildFromException(ex);
+                        }
                     }
 
                     actionExecutedContext.Response.Content = new ObjectContent(payloadValue.GetType(), payloadValue, objectContent.Formatter);

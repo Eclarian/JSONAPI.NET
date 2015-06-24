@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Net;
 using FluentAssertions;
-using JSONAPI.Payload;
 using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace JSONAPI.Tests.Payload
+namespace JSONAPI.Tests.Payload.Builders
 {
     [TestClass]
     public class ErrorPayloadBuilderTests

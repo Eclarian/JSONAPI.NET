@@ -100,9 +100,10 @@
     <Compile Include="Payload\Builders\FallbackPayloadBuilderTests.cs" />
     <Compile Include="Payload\Builders\RegistryDrivenSingleResourcePayloadBuilderTests.cs" />
     <Compile Include="Payload\DefaultLinkConventionsTests.cs" />
-    <Compile Include="Payload\ErrorPayloadBuilderTests.cs" />
+    <Compile Include="Payload\Builders\ErrorPayloadBuilderTests.cs" />
     <Compile Include="Payload\JsonApiSerializerTestsBase.cs" />
     <Compile Include="Payload\ErrorSerializerTests.cs" />
+    <Compile Include="Payload\Builders\RegistryDrivenPayloadBuilderTests.cs" />
     <Compile Include="Payload\ResourceLinkageSerializerTests.cs" />
     <Compile Include="Payload\MetadataSerializerTests.cs" />
     <Compile Include="Payload\RelationshipObjectSerializerTests.cs" />
