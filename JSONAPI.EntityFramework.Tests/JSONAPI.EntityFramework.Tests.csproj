@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Acceptance\AttributeSerializationTests.cs" />
+    <Compile Include="Acceptance\ErrorsTests.cs" />
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\PayloadTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
@@ -181,6 +182,8 @@
     <EmbeddedResource Include="Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_does_not_exist.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_action_throws_exception.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

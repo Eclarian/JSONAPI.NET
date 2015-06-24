@@ -25,7 +25,7 @@ namespace JSONAPI.Payload.Builders
             var error = new Error
             {
                 Id = Guid.NewGuid().ToString(),
-                Title = "The FallbackPayloadBuilderAttribute encountered an HttpError after the controller action completed.",
+                Title = "An HttpError was returned.",
                 Detail = httpError.Message,
                 Status = statusCode
             };

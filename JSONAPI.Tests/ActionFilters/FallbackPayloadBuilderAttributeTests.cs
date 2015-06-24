@@ -42,10 +42,9 @@ namespace JSONAPI.Tests.ActionFilters
             var cancellationTokenSource = new CancellationTokenSource();
             var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
 
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 
@@ -62,10 +61,9 @@ namespace JSONAPI.Tests.ActionFilters
             var cancellationTokenSource = new CancellationTokenSource();
             var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
 
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 
@@ -85,10 +83,9 @@ namespace JSONAPI.Tests.ActionFilters
             var cancellationTokenSource = new CancellationTokenSource();
             var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
 
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 
@@ -97,81 +94,24 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
-        public void OnActionExecutedAsync_creates_IErrorPayload_if_there_is_an_exception()
+        public void OnActionExecutedAsync_does_nothing_if_there_is_an_exception()
         {
             // Arrange
+            var objectContent = new object();
             var theException = new Exception("This is an error.");
-            var actionExecutedContext = GetActionExecutedContext(new object(), theException);
+            var actionExecutedContext = GetActionExecutedContext(objectContent, theException);
             var cancellationTokenSource = new CancellationTokenSource();
             var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-
-            var mockError = new Mock<IError>(MockBehavior.Strict);
-            mockError.Setup(e => e.Status).Returns(HttpStatusCode.InternalServerError);
-            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
-            mockResult.Setup(r => r.Errors).Returns(new[] { mockError.Object });
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(theException)).Returns(mockResult.Object);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
 
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 
             var newObjectContent = ((ObjectContent) actionExecutedContext.Response.Content).Value;
-            newObjectContent.Should().BeSameAs(mockResult.Object);
-            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-        }
-
-        [TestMethod]
-        public void OnActionExecutedAsync_creates_IErrorPayload_if_there_is_a_JsonApiException()
-        {
-            // Arrange
-            var mockError = new Mock<IError>(MockBehavior.Strict);
-            mockError.Setup(e => e.Status).Returns(HttpStatusCode.Conflict);
-            var theException = new JsonApiException(mockError.Object);
-            var actionExecutedContext = GetActionExecutedContext(new object(), theException);
-            var cancellationTokenSource = new CancellationTokenSource();
-            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-
-            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
-            mockResult.Setup(r => r.Errors).Returns(new[] { mockError.Object });
-            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(theException)).Returns(mockResult.Object);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
-
-            // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
-            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
-            task.Wait();
-
-            var newObjectContent = ((ObjectContent)actionExecutedContext.Response.Content).Value;
-            newObjectContent.Should().BeSameAs(mockResult.Object);
-            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        }
-
-        [TestMethod]
-        public void OnActionExecutedAsync_creates_IErrorPayload_if_there_is_an_exception_with_no_response()
-        {
-            // Arrange
-            var theException = new Exception("This is an error.");
-            var actionContext = new HttpActionContext();
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, theException);
-            var cancellationTokenSource = new CancellationTokenSource();
-            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            var resultErrorPayload = new ErrorPayload(new IError[] { }, null);
-            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(theException)).Returns(resultErrorPayload);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
-
-            // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
-            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
-            task.Wait();
-
-            var newObjectContent = ((ObjectContent)actionExecutedContext.Response.Content).Value;
-            newObjectContent.Should().BeSameAs(resultErrorPayload);
-            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            newObjectContent.Should().BeSameAs(objectContent);
+            actionExecutedContext.Exception.Should().Be(theException);
         }
 
         private class Fruit
@@ -192,10 +132,9 @@ namespace JSONAPI.Tests.ActionFilters
                 .Returns(Task.FromResult(mockResult.Object));
 
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
 
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 
@@ -205,71 +144,7 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
-        public void OnActionExecutedAsync_creates_IErrorPayload_if_fallbackPayloadBuilder_throws_an_unhandled_exception()
-        {
-            // Arrange
-            var payload = new Fruit();
-            var actionExecutedContext = GetActionExecutedContext(payload);
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            var exception = new Exception();
-            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-            mockFallbackPayloadBuilder
-                .Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>(), cancellationTokenSource.Token))
-                .Throws(exception);
-
-            var mockError = new Mock<IError>(MockBehavior.Strict);
-            mockError.Setup(e => e.Status).Returns(HttpStatusCode.InternalServerError);
-            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
-            mockResult.Setup(r => r.Errors).Returns(new[] { mockError.Object });
-            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(exception)).Returns(mockResult.Object);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
-
-            // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
-            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
-            task.Wait();
-
-            // Assert
-            ((ObjectContent)actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
-            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-        }
-
-        [TestMethod]
-        public async Task OnActionExecutedAsync_creates_IErrorPayload_if_fallbackPayloadBuilder_throws_a_JsonApiException()
-        {
-            // Arrange
-            var payload = new Fruit();
-            var actionExecutedContext = GetActionExecutedContext(payload);
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            var mockError = new Mock<IError>(MockBehavior.Strict);
-            mockError.Setup(e => e.Status).Returns(HttpStatusCode.BadRequest);
-            var exception = new JsonApiException(mockError.Object);
-            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-            mockFallbackPayloadBuilder
-                .Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>(), cancellationTokenSource.Token))
-                .Throws(exception);
-
-            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
-            mockResult.Setup(r => r.Errors).Returns(new[] { mockError.Object });
-            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            mockErrorPayloadBuilder.Setup(b => b.BuildFromException(exception)).Returns(mockResult.Object);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
-
-            // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
-            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
-            task.Wait();
-
-            // Assert
-            ((ObjectContent)actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
-            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        }
-
-        [TestMethod]
-        public async Task OnActionExecutedAsync_creates_IErrorPayload_for_HttpError()
+        public void OnActionExecutedAsync_creates_IErrorPayload_for_HttpError()
         {
             // Arrange
             var httpError = new HttpError("Some error");
@@ -284,10 +159,9 @@ namespace JSONAPI.Tests.ActionFilters
 
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
             mockErrorPayloadBuilder.Setup(b => b.BuildFromHttpError(httpError, HttpStatusCode.OK)).Returns(mockResult.Object);
-            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
             
             // Act
-            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object);
             var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
             task.Wait();
 

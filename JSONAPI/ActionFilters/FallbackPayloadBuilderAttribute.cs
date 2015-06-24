@@ -19,26 +19,22 @@ namespace JSONAPI.ActionFilters
     {
         private readonly IFallbackPayloadBuilder _fallbackPayloadBuilder;
         private readonly IErrorPayloadBuilder _errorPayloadBuilder;
-        private readonly IErrorPayloadSerializer _errorPayloadSerializer;
 
         /// <summary>
         /// Creates a FallbackPayloadBuilderAttribute
         /// </summary>
         /// <param name="fallbackPayloadBuilder"></param>
         /// <param name="errorPayloadBuilder"></param>
-        /// <param name="errorPayloadSerializer"></param>
-        public FallbackPayloadBuilderAttribute(IFallbackPayloadBuilder fallbackPayloadBuilder,
-            IErrorPayloadBuilder errorPayloadBuilder, IErrorPayloadSerializer errorPayloadSerializer)
+        public FallbackPayloadBuilderAttribute(IFallbackPayloadBuilder fallbackPayloadBuilder, IErrorPayloadBuilder errorPayloadBuilder)
         {
             _fallbackPayloadBuilder = fallbackPayloadBuilder;
             _errorPayloadBuilder = errorPayloadBuilder;
-            _errorPayloadSerializer = errorPayloadSerializer;
         }
 
         public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext,
             CancellationToken cancellationToken)
         {
-            if (actionExecutedContext.Response != null)
+            if (actionExecutedContext.Response != null && actionExecutedContext.Exception == null)
             {
                 var content = actionExecutedContext.Response.Content;
                 var objectContent = content as ObjectContent;
@@ -61,33 +57,15 @@ namespace JSONAPI.ActionFilters
                     }
 
                     object payloadValue;
-                    if (actionExecutedContext.Exception != null)
+                    var httpError = objectContent.Value as HttpError;
+                    if (httpError != null)
                     {
-                        payloadValue = _errorPayloadBuilder.BuildFromException(actionExecutedContext.Exception);
+                        payloadValue = _errorPayloadBuilder.BuildFromHttpError(httpError, actionExecutedContext.Response.StatusCode);
                     }
                     else
                     {
-                        var httpError = objectContent.Value as HttpError;
-                        if (httpError != null)
-                        {
-                            payloadValue = _errorPayloadBuilder.BuildFromHttpError(httpError, actionExecutedContext.Response.StatusCode);
-                        }
-                        else
-                        {
-                            try
-                            {
-                                payloadValue =
-                                    await _fallbackPayloadBuilder.BuildPayload(objectContent.Value, actionExecutedContext.Request, cancellationToken);
-                            }
-                            catch (JsonApiException ex)
-                            {
-                                payloadValue = _errorPayloadBuilder.BuildFromException(ex);
-                            }
-                            catch (Exception ex)
-                            {
-                                payloadValue = _errorPayloadBuilder.BuildFromException(ex);
-                            }
-                        }
+                        payloadValue =
+                            await _fallbackPayloadBuilder.BuildPayload(objectContent.Value, actionExecutedContext.Request, cancellationToken);
                     }
 
                     errorPayload = payloadValue as IErrorPayload;
@@ -98,15 +76,6 @@ namespace JSONAPI.ActionFilters
 
                     actionExecutedContext.Response.Content = new ObjectContent(payloadValue.GetType(), payloadValue, objectContent.Formatter);
                 }
-            }
-            else if (actionExecutedContext.Exception != null)
-            {
-                var payload = _errorPayloadBuilder.BuildFromException(actionExecutedContext.Exception);
-                var formatter = new JsonApiFormatter(null, null, _errorPayloadSerializer);
-                actionExecutedContext.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new ObjectContent(payload.GetType(), payload, formatter)
-                };
             }
 
             await Task.Yield();

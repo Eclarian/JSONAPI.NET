@@ -73,7 +73,8 @@ namespace JSONAPI.Core
             var queryableResourcePayloadBuilder = _queryablePayloadBuilderFactory(resourceCollectionPayloadBuilder);
             var errorPayloadBuilder = new ErrorPayloadBuilder();
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder, queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder);
-            httpConfig.Filters.Add(new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder, errorPayloadSerializer));
+            httpConfig.Filters.Add(new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder));
+            httpConfig.Filters.Add(new JsonApiExceptionFilter(errorPayloadBuilder, formatter));
 
             httpConfig.Services.Replace(typeof(IHttpControllerSelector),
                 new PascalizedControllerSelector(httpConfig));

@@ -120,6 +120,7 @@
     <Compile Include="Controllers\SamplesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
+    <Compile Include="Controllers\TreesController.cs" />
     <Compile Include="Controllers\UserGroupsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\TagsController.cs" />
