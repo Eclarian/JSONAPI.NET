@@ -10,23 +10,22 @@
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "401"
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/author",
+                        "related": "https://www.example.com/posts/201/author"
                     }
                 },
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "101" },
-                        { "type": "comments", "id": "102" },
-                        { "type": "comments", "id": "103" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/comments",
+                        "related": "https://www.example.com/posts/201/comments"
+                    }
                 },
                 "tags": {
-                    "data": [
-                        { "type": "tags", "id": "301" },
-                        { "type": "tags", "id": "302" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/tags",
+                        "related": "https://www.example.com/posts/201/tags"
+                    }
                 }
             }
         },
@@ -39,27 +38,17 @@
             },
             "relationships": {
                 "post": {
-                    "data": {
-                        "type": "posts",
-                        "id": "201"
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/post",
+                        "related": "https://www.example.com/comments/101/post"
                     }
                 },
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "403"
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/author",
+                        "related": "https://www.example.com/comments/101/author"
                     }
                 }
-            }
-        }
-    ],
-    "included": [
-        {
-            "type": "users",
-            "id": "401",
-            "attributes": {
-                "firstName": "Alice",
-                "lastName": "Smith"
             }
         }
     ]
