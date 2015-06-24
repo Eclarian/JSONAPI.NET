@@ -41,9 +41,10 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
                 NullableDateTimeOffsetField = null,
                 GuidField = default(Guid),
                 NullableGuidField = null,
-                StringField = default(String),
+                StringField = null,
                 EnumField = default(SampleEnum),
                 NullableEnumField = null,
+                ComplexAttributeField = null
             };
             var s2 = new Sample
             {
@@ -81,6 +82,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
                 StringField = "Some string 156",
                 EnumField = SampleEnum.Value1,
                 NullableEnumField = SampleEnum.Value2,
+                ComplexAttributeField = "{\"foo\": { \"baz\": [11] }, \"bar\": 5}"
             };
 
             return Ok(new[] { s1, s2 });

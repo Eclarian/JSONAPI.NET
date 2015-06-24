@@ -10,7 +10,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 
         public string Name { get; set; }
 
-        [SerializeAs(SerializeAsOptions.RelatedLink)]
         [RelatedResourceLinkTemplate("/cities/{1}/state")]
         public virtual State State { get; set; }
     }

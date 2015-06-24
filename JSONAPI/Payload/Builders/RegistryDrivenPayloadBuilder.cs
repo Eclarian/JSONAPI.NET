@@ -58,8 +58,8 @@ namespace JSONAPI.Payload.Builders
 
             foreach (var attribute in resourceTypeRegistration.Attributes)
             {
-                var propertyValue = attribute.Property.GetValue(modelObject);
-                attributes[attribute.JsonKey] = propertyValue == null ? null : JToken.FromObject(propertyValue);
+                var propertyValue = attribute.GetValue(modelObject);
+                attributes[attribute.JsonKey] = propertyValue;
             }
 
             foreach (var modelRelationship in resourceTypeRegistration.Relationships)

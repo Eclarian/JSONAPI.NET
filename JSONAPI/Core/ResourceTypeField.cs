@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using JSONAPI.Attributes;
 using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Core
@@ -36,6 +37,25 @@ namespace JSONAPI.Core
         internal ResourceTypeAttribute(PropertyInfo property, string jsonKey)
             : base(property, jsonKey)
         {
+            var serializeAsComplexAttribute = property.GetCustomAttribute<SerializeAsComplexAttribute>();
+            if (serializeAsComplexAttribute != null)
+            {
+                _valueFactory = obj =>
+                {
+                    var val = property.GetValue(obj);
+                    if (val == null) return null;
+                    return JToken.Parse(val.ToString());
+                };
+            }
+            else
+            {
+                _valueFactory = obj =>
+                {
+                    var val = property.GetValue(obj);
+                    if (val == null) return null;
+                    return JToken.FromObject(val);
+                };
+            }
         }
 
         /// <summary>
@@ -45,7 +65,7 @@ namespace JSONAPI.Core
         /// <returns></returns>
         public JToken GetValue(object resource)
         {
-            throw new NotImplementedException();
+            return _valueFactory(resource);
         }
     }
 

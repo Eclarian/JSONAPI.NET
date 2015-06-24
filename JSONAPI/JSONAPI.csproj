@@ -78,8 +78,7 @@
     <Compile Include="ActionFilters\SynchronousEnumerationTransformer.cs" />
     <Compile Include="Attributes\RelatedResourceLinkTemplate.cs" />
     <Compile Include="Attributes\RelationshipLinkTemplate.cs" />
-    <Compile Include="Attributes\SerializeAs.cs" />
-    <Compile Include="Attributes\SerializeStringAsRawJsonAttribute.cs" />
+    <Compile Include="Attributes\SerializeAsComplexAttribute.cs" />
     <Compile Include="Attributes\UseAsIdAttribute.cs" />
     <Compile Include="Core\DefaultQueryablePayloadBuilderConfiguration.cs" />
     <Compile Include="Core\IMetadataManager.cs" />

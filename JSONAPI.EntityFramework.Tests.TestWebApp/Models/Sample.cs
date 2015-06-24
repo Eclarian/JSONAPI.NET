@@ -1,4 +1,5 @@
 ﻿using System;
+using JSONAPI.Attributes;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 {
@@ -44,5 +45,8 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public string StringField { get; set; }
         public SampleEnum EnumField { get; set; }
         public SampleEnum? NullableEnumField { get; set; }
+
+        [SerializeAsComplex]
+        public string ComplexAttributeField { get; set; }
     }
 }

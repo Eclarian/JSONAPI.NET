@@ -7,6 +7,6 @@ namespace JSONAPI.Tests.Models
         public int Id { get; set; }
         public string Body { get; set; }
         public Post Post { get; set; }
-        [SerializeStringAsRawJson]public string CustomData { get; set; }
+        [SerializeAsComplex]public string CustomData { get; set; }
     }
 }
