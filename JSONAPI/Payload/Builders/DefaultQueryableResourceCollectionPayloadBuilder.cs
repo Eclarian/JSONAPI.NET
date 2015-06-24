@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,8 +54,10 @@ namespace JSONAPI.Payload.Builders
                 query = paginationResults.PagedQuery;
             }
 
+            var linkBaseUrl = new Uri(request.RequestUri.AbsoluteUri.Replace(request.RequestUri.PathAndQuery, String.Empty)).ToString();
+
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
-            return _resourceCollectionPayloadBuilder.BuildPayload(results);
+            return _resourceCollectionPayloadBuilder.BuildPayload(results, linkBaseUrl, null);
         }
     }
 }

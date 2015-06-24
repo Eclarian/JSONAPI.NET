@@ -71,7 +71,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
                 .RegisterResourceType(typeof (User))
                 .RegisterResourceType(typeof (UserGroup));
 
-            var linkConventions = new DefaultLinkConventions("https://www.example.com");
+            var linkConventions = new DefaultLinkConventions();
 
             // Configure JSON API
             new JsonApiConfiguration(modelManager, linkConventions)

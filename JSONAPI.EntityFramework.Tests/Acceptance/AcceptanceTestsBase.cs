@@ -21,7 +21,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         private static readonly Regex GuidRegex = new Regex(@"\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b", RegexOptions.IgnoreCase);
         //private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace"":[\s]*""[\w\:\\\.\s\,\-]*""");
         private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace""[\s]*:[\s]*"".*?""");
-        private static readonly Uri BaseUri = new Uri("http://localhost");
+        private static readonly Uri BaseUri = new Uri("https://www.example.com");
 
         protected static DbConnection GetEffortConnection()
         {

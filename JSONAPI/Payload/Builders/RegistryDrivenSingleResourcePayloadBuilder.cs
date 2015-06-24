@@ -19,10 +19,10 @@ namespace JSONAPI.Payload.Builders
         {
         }
 
-        public ISingleResourcePayload BuildPayload(object primaryData, params string[] includePathExpressions)
+        public ISingleResourcePayload BuildPayload(object primaryData, string linkBaseUrl, string[] includePathExpressions)
         {
             var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
-            var primaryDataResource = CreateResourceObject(primaryData, idDictionariesByType, null, includePathExpressions);
+            var primaryDataResource = CreateResourceObject(primaryData, idDictionariesByType, null, includePathExpressions, linkBaseUrl);
 
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
             var payload = new SingleResourcePayload(primaryDataResource, relatedData, null);

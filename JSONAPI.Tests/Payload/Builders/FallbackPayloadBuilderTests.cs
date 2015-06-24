@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http.Controllers;
 using FluentAssertions;
 using JSONAPI.Core;
 using JSONAPI.Payload;
@@ -36,17 +37,22 @@ namespace JSONAPI.Tests.Payload.Builders
             var mockPayload = new Mock<ISingleResourcePayload>(MockBehavior.Strict);
 
             var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
-            singleResourcePayloadBuilder.Setup(b => b.BuildPayload(objectContent)).Returns(mockPayload.Object);
+            singleResourcePayloadBuilder.Setup(b => b.BuildPayload(objectContent, It.IsAny<string>(), null)).Returns(mockPayload.Object);
 
             var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
 
             var cancellationTokenSource = new CancellationTokenSource();
 
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://www.example.com/fruits");
+            var mockRequestContext = new Mock<HttpRequestContext>();
+            mockRequestContext.Setup(c => c.VirtualPathRoot).Returns("https://www.example.com/fruits");
+            request.SetRequestContext(mockRequestContext.Object);
+
             // Act
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
                 mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
-            var resultPayload = await fallbackPayloadBuilder.BuildPayload(objectContent, null, cancellationTokenSource.Token);
+            var resultPayload = await fallbackPayloadBuilder.BuildPayload(objectContent, request, cancellationTokenSource.Token);
 
             // Assert
             resultPayload.Should().BeSameAs(mockPayload.Object);
@@ -102,16 +108,18 @@ namespace JSONAPI.Tests.Payload.Builders
 
             var cancellationTokenSource = new CancellationTokenSource();
 
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://www.example.com/fruits");
+
             var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             mockResourceCollectionPayloadBuilder
-                .Setup(b => b.BuildPayload(items))
+                .Setup(b => b.BuildPayload(items, "https://www.example.com/", It.IsAny<string[]>()))
                 .Returns(() => (mockPayload.Object));
 
             // Act
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
                 mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
-            var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, null, cancellationTokenSource.Token);
+            var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, request, cancellationTokenSource.Token);
 
             // Assert
             resultPayload.Should().BeSameAs(mockPayload.Object);

@@ -1,6 +1,5 @@
 ﻿using System.Web.Http;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework;
 using JSONAPI.Payload;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
@@ -25,7 +24,7 @@ namespace JSONAPI.TodoMVC.API
 
             var httpConfig = new HttpConfiguration();
 
-            var linkConventions = new DefaultLinkConventions("https://www.example.com");
+            var linkConventions = new DefaultLinkConventions();
 
             // Configure JSON API
             new JsonApiConfiguration(modelManager, linkConventions)

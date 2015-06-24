@@ -45,9 +45,10 @@ namespace JSONAPI.Payload.Builders
         /// <param name="idDictionariesByType"></param>
         /// <param name="currentPath"></param>
         /// <param name="includePathExpressions"></param>
+        /// <param name="linkBaseUrl"></param>
         /// <returns></returns>
         protected ResourceObject CreateResourceObject(object modelObject, IDictionary<string, IDictionary<string, ResourceObject>> idDictionariesByType,
-            string currentPath, string[] includePathExpressions)
+            string currentPath, string[] includePathExpressions, string linkBaseUrl)
         {
             var modelObjectRuntimeType = modelObject.GetType();
             var resourceTypeRegistration = _resourceTypeRegistry.GetRegistrationForType(modelObjectRuntimeType);
@@ -93,7 +94,7 @@ namespace JSONAPI.Payload.Builders
                             if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
                             {
                                 relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
-                                    childPath, includePathExpressions);
+                                    childPath, includePathExpressions, linkBaseUrl);
                                 idDictionary[identifier.Id] = relatedResourceObject;
                             }
                         }
@@ -117,7 +118,7 @@ namespace JSONAPI.Payload.Builders
                             if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
                             {
                                 relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
-                                    childPath, includePathExpressions);
+                                    childPath, includePathExpressions, linkBaseUrl);
                                 idDictionary[identifier.Id] = relatedResourceObject;
                             }
 
@@ -126,8 +127,8 @@ namespace JSONAPI.Payload.Builders
                     }
                 }
 
-                var selfLink = _linkConventions.GetRelationshipLink(modelObject, _resourceTypeRegistry, modelRelationship);
-                var relatedResourceLink = _linkConventions.GetRelatedResourceLink(modelObject, _resourceTypeRegistry, modelRelationship);
+                var selfLink = _linkConventions.GetRelationshipLink(modelObject, _resourceTypeRegistry, modelRelationship, linkBaseUrl);
+                var relatedResourceLink = _linkConventions.GetRelatedResourceLink(modelObject, _resourceTypeRegistry, modelRelationship, linkBaseUrl);
 
                 relationships[modelRelationship.JsonKey] = new RelationshipObject(linkage, selfLink, relatedResourceLink);
             }

@@ -36,8 +36,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/relationships/cities");
@@ -57,8 +57,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/relationships/cities");
@@ -77,8 +77,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/foo/45/bar");
@@ -97,8 +97,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelationshipLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/foo/45/bar");
@@ -118,8 +118,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/cities");
@@ -139,8 +139,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/countries/45/cities");
@@ -159,8 +159,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/bar/45/qux");
@@ -179,8 +179,8 @@ namespace JSONAPI.Tests.Payload
             mockRegistry.Setup(m => m.GetRegistrationForType(typeof(Country))).Returns(mockTypeRegistration.Object);
 
             // Act
-            var conventions = new DefaultLinkConventions("https://www.example.com/");
-            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty);
+            var conventions = new DefaultLinkConventions();
+            var relationshipLink = conventions.GetRelatedResourceLink(relationshipOwner, mockRegistry.Object, relationshipProperty, "https://www.example.com");
 
             // Assert
             relationshipLink.Href.Should().Be("https://www.example.com/bar/45/qux");

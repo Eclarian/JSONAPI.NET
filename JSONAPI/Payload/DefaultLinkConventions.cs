@@ -4,41 +4,29 @@ using JSONAPI.Core;
 namespace JSONAPI.Payload
 {
     /// <summary>
-    /// Default implementation of ILinkConventions. Adheres to JSON API recommendations for URL formatting.
+    /// Implementation of ILinkConventions that adheres to JSON API recommendations for URL formatting.
     /// </summary>
     public class DefaultLinkConventions : ILinkConventions
     {
-        private readonly string _baseUrl;
-
-        /// <summary>
-        /// Creates a new DefaultLinkConventions
-        /// </summary>
-        /// <param name="baseUrl"></param>
-        public DefaultLinkConventions(string baseUrl)
+        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl)
         {
-            _baseUrl = baseUrl;
-        }
-
-        public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property)
-        {
-            var url = BuildRelationshipUrl(relationshipOwner, resourceTypeRegistry, property);
+            var url = BuildRelationshipUrl(relationshipOwner, resourceTypeRegistry, property, baseUrl);
             var metadata = GetMetadataForRelationshipLink(relationshipOwner, property);
             return new Link(url, metadata);
         }
 
-        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property)
+        public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl)
         {
-            var url = BuildRelatedResourceUrl(relationshipOwner, resourceTypeRegistry, property);
+            var url = BuildRelatedResourceUrl(relationshipOwner, resourceTypeRegistry, property, baseUrl);
             var metadata = GetMetadataForRelatedResourceLink(relationshipOwner, property);
             return new Link(url, metadata);
         }
 
-        private string GetSanitizedBaseUrl()
+        private string GetSanitizedBaseUrl(string baseUrl)
         {
-            var sanitizedBaseUrl = _baseUrl;
-            while (sanitizedBaseUrl[sanitizedBaseUrl.Length - 1] == '/')
-                sanitizedBaseUrl = _baseUrl.Substring(0, _baseUrl.Length - 1);
-            return sanitizedBaseUrl;
+            while (baseUrl[baseUrl.Length - 1] == '/')
+                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
+            return baseUrl;
         }
 
         /// <summary>
@@ -47,12 +35,13 @@ namespace JSONAPI.Payload
         /// <param name="relationshipOwner"></param>
         /// <param name="resourceTypeRegistry"></param>
         /// <param name="property"></param>
+        /// <param name="baseUrl"></param>
         /// <returns></returns>
         protected virtual string BuildRelationshipUrl(object relationshipOwner, IResourceTypeRegistry resourceTypeRegistry,
-            ResourceTypeRelationship property)
+            ResourceTypeRelationship property, string baseUrl)
         {
             var relationshipOwnerType = relationshipOwner.GetType();
-            var sanitizedBaseUrl = GetSanitizedBaseUrl();
+            var sanitizedBaseUrl = GetSanitizedBaseUrl(baseUrl);
             var registration = resourceTypeRegistry.GetRegistrationForType(relationshipOwnerType);
             var id = registration.GetIdForResource(relationshipOwner);
             if (property.SelfLinkTemplate != null)
@@ -79,12 +68,13 @@ namespace JSONAPI.Payload
         /// <param name="relationshipOwner"></param>
         /// <param name="resourceTypeRegistry"></param>
         /// <param name="property"></param>
+        /// <param name="baseUrl"></param>
         /// <returns></returns>
         protected virtual string BuildRelatedResourceUrl(object relationshipOwner, IResourceTypeRegistry resourceTypeRegistry,
-            ResourceTypeRelationship property)
+            ResourceTypeRelationship property, string baseUrl)
         {
             var relationshipOwnerType = relationshipOwner.GetType();
-            var sanitizedBaseUrl = GetSanitizedBaseUrl();
+            var sanitizedBaseUrl = GetSanitizedBaseUrl(baseUrl);
             var registration = resourceTypeRegistry.GetRegistrationForType(relationshipOwnerType);
             var id = registration.GetIdForResource(relationshipOwner);
             if (property.RelatedResourceLinkTemplate != null)

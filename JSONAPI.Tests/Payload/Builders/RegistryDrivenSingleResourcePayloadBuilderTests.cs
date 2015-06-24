@@ -159,11 +159,11 @@ namespace JSONAPI.Tests.Payload.Builders
             mockRegistry.Setup(r => r.GetRegistrationForType(typeof(Province))).Returns(provinceRegistration.Object);
             mockRegistry.Setup(r => r.GetRegistrationForType(typeof(Continent))).Returns(continentRegistration.Object);
 
-            var linkConventions = new DefaultLinkConventions("http://www.example.com");
+            var linkConventions = new DefaultLinkConventions();
 
             // Act
             var payloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(mockRegistry.Object, linkConventions);
-            var payload = payloadBuilder.BuildPayload(country, "provinces.capital", "continent");
+            var payload = payloadBuilder.BuildPayload(country, "http://www.example.com", new[] { "provinces.capital", "continent" });
 
             // Assert
             payload.PrimaryData.Id.Should().Be("4");

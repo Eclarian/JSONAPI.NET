@@ -1,4 +1,5 @@
-﻿using JSONAPI.Core;
+﻿using System.Net.Http;
+using JSONAPI.Core;
 
 namespace JSONAPI.Payload
 {
@@ -12,17 +13,19 @@ namespace JSONAPI.Payload
         /// </summary>
         /// <param name="relationshipOwner">The resource that this relationship belongs to.</param>
         /// <param name="resourceTypeRegistry">The model manage to use to lookup information about the relationship owner's type</param>
-        /// <param name="property"></param>
+        /// <param name="property">The property to get the link for</param>
+        /// <param name="baseUrl">The portion of the URL that the link will be appended to</param>
         /// <returns></returns>
-        ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property);
+        ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl);
 
         /// <summary>
         /// Builds a related resource link for the given model property
         /// </summary>
         /// <param name="relationshipOwner">The resource that this relationship belongs to.</param>
         /// <param name="resourceTypeRegistry">The model manage to use to lookup information about the relationship owner's type</param>
-        /// <param name="property"></param>
+        /// <param name="property">The property to get the link for</param>
+        /// <param name="baseUrl">The portion of the URL that the link will be appended to</param>
         /// <returns></returns>
-        ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property);
+        ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl);
     }
 }

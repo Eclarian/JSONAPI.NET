@@ -73,16 +73,18 @@ namespace JSONAPI.Payload.Builders
                 isCollection = true;
             }
 
+            var linkBaseUrl = new Uri(requestMessage.RequestUri.AbsoluteUri.Replace(requestMessage.RequestUri.PathAndQuery, String.Empty)).ToString();
+
             if (isCollection)
             {
                 var buildPayloadMethod =
                     _openBuildPayloadFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
                 return
-                    (dynamic) buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] {obj, new string[] {}});
+                    (dynamic)buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] { obj, linkBaseUrl, new string[] { } });
             }
 
             // Single resource object
-            return _singleResourcePayloadBuilder.BuildPayload(obj);
+            return _singleResourcePayloadBuilder.BuildPayload(obj, linkBaseUrl, null);
         }
 
         private static Type GetEnumerableElementType(Type collectionType)

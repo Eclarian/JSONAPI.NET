@@ -19,11 +19,11 @@ namespace JSONAPI.Payload.Builders
         {
         }
 
-        public IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, params string[] includePathExpressions)
+        public IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions)
         {
             var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
             var primaryDataResources =
-                primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions))
+                primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions, linkBaseUrl))
                     .ToArray();
 
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
