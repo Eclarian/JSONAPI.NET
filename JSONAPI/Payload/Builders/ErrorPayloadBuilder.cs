@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Web.Http;
 
 namespace JSONAPI.Payload.Builders
 {
@@ -17,6 +18,20 @@ namespace JSONAPI.Payload.Builders
 
             var topLevelMetadata = GetTopLevelMetadata();
             return new ErrorPayload(new [] { error }, topLevelMetadata);
+        }
+
+        public IErrorPayload BuildFromHttpError(HttpError httpError, HttpStatusCode statusCode)
+        {
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = "The FallbackPayloadBuilderAttribute encountered an HttpError after the controller action completed.",
+                Detail = httpError.Message,
+                Status = statusCode
+            };
+
+            var topLevelMetadata = GetTopLevelMetadata();
+            return new ErrorPayload(new[] { (IError)error }, topLevelMetadata);
         }
 
         /// <summary>

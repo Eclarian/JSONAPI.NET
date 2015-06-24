@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Http.Filters;
 using JSONAPI.Json;
 using JSONAPI.Payload;
@@ -59,25 +60,33 @@ namespace JSONAPI.ActionFilters
                         return;
                     }
 
-                    var payloadValue = objectContent.Value;
+                    object payloadValue;
                     if (actionExecutedContext.Exception != null)
                     {
                         payloadValue = _errorPayloadBuilder.BuildFromException(actionExecutedContext.Exception);
                     }
                     else
                     {
-                        try
+                        var httpError = objectContent.Value as HttpError;
+                        if (httpError != null)
                         {
-                            payloadValue =
-                                await _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request, cancellationToken);
+                            payloadValue = _errorPayloadBuilder.BuildFromHttpError(httpError, actionExecutedContext.Response.StatusCode);
                         }
-                        catch (JsonApiException ex)
+                        else
                         {
-                            payloadValue = _errorPayloadBuilder.BuildFromException(ex);
-                        }
-                        catch (Exception ex)
-                        {
-                            payloadValue = _errorPayloadBuilder.BuildFromException(ex);
+                            try
+                            {
+                                payloadValue =
+                                    await _fallbackPayloadBuilder.BuildPayload(objectContent.Value, actionExecutedContext.Request, cancellationToken);
+                            }
+                            catch (JsonApiException ex)
+                            {
+                                payloadValue = _errorPayloadBuilder.BuildFromException(ex);
+                            }
+                            catch (Exception ex)
+                            {
+                                payloadValue = _errorPayloadBuilder.BuildFromException(ex);
+                            }
                         }
                     }
 

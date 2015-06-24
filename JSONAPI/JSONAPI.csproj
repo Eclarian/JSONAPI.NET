@@ -121,10 +121,8 @@
     <Compile Include="Payload\ILinkSerializer.cs" />
     <Compile Include="Payload\IMetadata.cs" />
     <Compile Include="Payload\ILink.cs" />
-    <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
     <Compile Include="Json\IErrorIdProvider.cs" />
-    <Compile Include="Json\IErrorSerializer.cs" />
     <Compile Include="Json\JsonApiFormatter.cs" />
     <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Json\RelationAggregator.cs" />

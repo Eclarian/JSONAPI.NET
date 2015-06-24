@@ -14,7 +14,6 @@ using System.IO;
 using System.Diagnostics;
 using JSONAPI.Payload;
 using Moq;
-using IErrorSerializer = JSONAPI.Json.IErrorSerializer;
 
 namespace JSONAPI.Tests.Json
 {

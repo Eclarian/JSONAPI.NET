@@ -5,6 +5,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using FluentAssertions;
@@ -265,6 +266,34 @@ namespace JSONAPI.Tests.ActionFilters
             // Assert
             ((ObjectContent)actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
             actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task OnActionExecutedAsync_creates_IErrorPayload_for_HttpError()
+        {
+            // Arrange
+            var httpError = new HttpError("Some error");
+            var actionExecutedContext = GetActionExecutedContext(httpError);
+            var cancellationTokenSource = new CancellationTokenSource();
+            var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
+
+            var mockError = new Mock<IError>(MockBehavior.Strict);
+            mockError.Setup(e => e.Status).Returns(HttpStatusCode.OK);
+            var mockResult = new Mock<IErrorPayload>(MockBehavior.Strict);
+            mockResult.Setup(r => r.Errors).Returns(new[] { mockError.Object });
+
+            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
+            mockErrorPayloadBuilder.Setup(b => b.BuildFromHttpError(httpError, HttpStatusCode.OK)).Returns(mockResult.Object);
+            var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);
+            
+            // Act
+            var attribute = new FallbackPayloadBuilderAttribute(mockFallbackPayloadBuilder.Object, mockErrorPayloadBuilder.Object, mockErrorPayloadSerializer.Object);
+            var task = attribute.OnActionExecutedAsync(actionExecutedContext, cancellationTokenSource.Token);
+            task.Wait();
+
+            // Assert
+            ((ObjectContent)actionExecutedContext.Response.Content).Value.Should().BeSameAs(mockResult.Object);
+            actionExecutedContext.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }

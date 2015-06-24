@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Web.Http;
 
 namespace JSONAPI.Payload.Builders
 {
@@ -13,5 +15,13 @@ namespace JSONAPI.Payload.Builders
         /// <param name="exception"></param>
         /// <returns></returns>
         IErrorPayload BuildFromException(Exception exception);
+
+        /// <summary>
+        /// Builds an error payload based on an HttpError
+        /// </summary>
+        /// <param name="httpError"></param>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        IErrorPayload BuildFromHttpError(HttpError httpError, HttpStatusCode statusCode);
     }
 }
