@@ -6,6 +6,7 @@ using JSONAPI.Tests.Models;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using FluentAssertions;
 using Newtonsoft.Json;
 
@@ -52,8 +53,23 @@ namespace JSONAPI.Tests.Core
             public string AnotherSaladType { get; set; }
         }
 
+        private class Continent
+        {
+            [UseAsId]
+            public string Name { get; set; }
+
+            public string Id { get; set; }
+        }
+
+        private class Boat
+        {
+            public string Id { get; set; }
+
+            public string Type { get; set; }
+        }
+
         [TestMethod]
-        public void Cant_register_model_with_missing_id()
+        public void Cant_register_type_with_missing_id()
         {
             // Arrange
             var mm = new ResourceTypeRegistry(new PluralizationService());
@@ -64,7 +80,79 @@ namespace JSONAPI.Tests.Core
             // Assert
             action.ShouldThrow<InvalidOperationException>()
                 .Which.Message.Should()
-                .Be("Unable to determine Id property for type `invalid-models`.");
+                .Be("Unable to determine Id property for type `InvalidModel`.");
+        }
+
+        [TestMethod]
+        public void Cant_register_type_with_non_id_property_called_id()
+        {
+            // Arrange
+            var mm = new ResourceTypeRegistry(new PluralizationService());
+
+            // Act
+            Action action = () => mm.RegisterResourceType(typeof(Continent));
+
+            // Assert
+            action.ShouldThrow<InvalidOperationException>()
+                .Which.Message.Should()
+                .Be("Failed to register type `Continent` because it contains a non-id property that would serialize as \"id\".");
+        }
+
+        [TestMethod]
+        public void Cant_register_type_with_property_called_type()
+        {
+            // Arrange
+            var mm = new ResourceTypeRegistry(new PluralizationService());
+
+            // Act
+            Action action = () => mm.RegisterResourceType(typeof(Boat));
+
+            // Assert
+            action.ShouldThrow<InvalidOperationException>()
+                .Which.Message.Should()
+                .Be("Failed to register type `Boat` because it contains a property that would serialize as \"type\".");
+        }
+
+        [TestMethod]
+        public void Cant_register_type_with_two_properties_with_the_same_name()
+        {
+            var pluralizationService = new PluralizationService();
+            var mm = new ResourceTypeRegistry(pluralizationService);
+            Type saladType = typeof(Salad);
+
+            // Act
+            Action action = () => mm.RegisterResourceType(saladType);
+
+            // Assert
+            action.ShouldThrow<InvalidOperationException>().Which.Message.Should()
+                .Be("Failed to register type `Salad` because contains multiple properties that would serialize as `salad-type`.");
+        }
+
+        [TestMethod]
+        public void RegisterResourceType_sets_up_registration_correctly()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+
+            // Act
+            var registry = new ResourceTypeRegistry(pluralizationService);
+            registry.RegisterResourceType(typeof(Post));
+            var postReg = registry.GetRegistrationForType(typeof(Post));
+            
+            // Assert
+            postReg.IdProperty.Should().BeSameAs(typeof(Post).GetProperty("Id"));
+            postReg.ResourceTypeName.Should().Be("posts");
+            postReg.Attributes.Length.Should().Be(1);
+            postReg.Attributes.First().Property.Should().BeSameAs(typeof(Post).GetProperty("Title"));
+            postReg.Relationships.Length.Should().Be(2);
+            postReg.Relationships[0].IsToMany.Should().BeTrue();
+            postReg.Relationships[0].Property.Should().BeSameAs(typeof(Post).GetProperty("Comments"));
+            postReg.Relationships[0].SelfLinkTemplate.Should().Be("/posts/{1}/relationships/comments");
+            postReg.Relationships[0].RelatedResourceLinkTemplate.Should().Be("/posts/{1}/comments");
+            postReg.Relationships[1].IsToMany.Should().BeFalse();
+            postReg.Relationships[1].Property.Should().BeSameAs(typeof(Post).GetProperty("Author"));
+            postReg.Relationships[1].SelfLinkTemplate.Should().BeNull();
+            postReg.Relationships[1].RelatedResourceLinkTemplate.Should().BeNull();
         }
 
         [TestMethod]
@@ -239,20 +327,6 @@ namespace JSONAPI.Tests.Core
             Assert.AreEqual("name", nameKey);
             Assert.AreEqual("posts", postsKey);
 
-        }
-        
-        [TestMethod]
-        public void Cant_register_type_with_two_properties_with_the_same_name()
-        {
-            var pluralizationService = new PluralizationService();
-            var mm = new ResourceTypeRegistry(pluralizationService);
-            Type saladType = typeof(Salad);
-
-            // Act
-            Action action = () => mm.RegisterResourceType(saladType);
-
-            // Assert
-            action.ShouldThrow<InvalidOperationException>().Which.Message.Should().Be("The type `salads` already contains a property keyed at `salad-type`.");
         }
     }
 }

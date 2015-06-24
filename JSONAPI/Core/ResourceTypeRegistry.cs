@@ -148,18 +148,29 @@ namespace JSONAPI.Core
                     var idProperty = CalculateIdProperty(type);
                     if (idProperty == null)
                         throw new InvalidOperationException(String.Format(
-                            "Unable to determine Id property for type `{0}`.", resourceTypeName));
+                            "Unable to determine Id property for type `{0}`.", type.Name));
 
                     var props = type.GetProperties();
                     foreach (var prop in props)
                     {
-                        var jsonKey = prop == idProperty
-                            ? "id"
-                            : CalculateJsonKeyForProperty(prop);
+                        if (prop == idProperty) continue;
+
+                        var ignore = prop.CustomAttributes.Any(c => c.AttributeType == typeof(JsonIgnoreAttribute));
+                        if (ignore) continue;
+
+                        var jsonKey = CalculateJsonKeyForProperty(prop);
+                        if (jsonKey == "id")
+                            throw new InvalidOperationException(
+                                String.Format("Failed to register type `{0}` because it contains a non-id property that would serialize as \"id\".", type.Name));
+
+                        if (jsonKey == "type")
+                            throw new InvalidOperationException(
+                                String.Format("Failed to register type `{0}` because it contains a property that would serialize as \"type\".", type.Name));
+
                         if (fieldMap.ContainsKey(jsonKey))
                             throw new InvalidOperationException(
-                                String.Format("The type `{0}` already contains a property keyed at `{1}`.",
-                                    resourceTypeName, jsonKey));
+                                String.Format("Failed to register type `{0}` because contains multiple properties that would serialize as `{1}`.",
+                                    type.Name, jsonKey));
                         var property = CreateResourceTypeField(prop, jsonKey);
                         fieldMap[jsonKey] = property;
                     }
@@ -183,11 +194,9 @@ namespace JSONAPI.Core
         protected virtual ResourceTypeField CreateResourceTypeField(PropertyInfo prop, string jsonKey)
         {
             var type = prop.PropertyType;
-            var ignoreByDefault =
-                prop.CustomAttributes.Any(c => c.AttributeType == typeof(JsonIgnoreAttribute));
 
             if (prop.PropertyType.CanWriteAsJsonApiAttribute())
-                return new ResourceTypeAttribute(prop, jsonKey, ignoreByDefault);
+                return new ResourceTypeAttribute(prop, jsonKey);
 
             var selfLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelationshipLinkTemplate>().FirstOrDefault();
             var selfLinkTemplate = selfLinkTemplateAttribute == null ? null : selfLinkTemplateAttribute.TemplateString;
@@ -198,9 +207,9 @@ namespace JSONAPI.Core
                 type.IsArray ||
                 (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
 
-            if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, ignoreByDefault, type, selfLinkTemplate, relatedResourceLinkTemplate);
+            if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, type, selfLinkTemplate, relatedResourceLinkTemplate);
             var relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
-            return new ToManyResourceTypeRelationship(prop, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
+            return new ToManyResourceTypeRelationship(prop, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
         }
 
         /// <summary>

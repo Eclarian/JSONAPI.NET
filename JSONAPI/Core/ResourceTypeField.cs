@@ -8,9 +8,8 @@ namespace JSONAPI.Core
     /// </summary>
     public abstract class ResourceTypeField
     {
-        internal ResourceTypeField(PropertyInfo property, string jsonKey, bool ignoreByDefault)
+        internal ResourceTypeField(PropertyInfo property, string jsonKey)
         {
-            IgnoreByDefault = ignoreByDefault;
             JsonKey = jsonKey;
             Property = property;
         }
@@ -24,11 +23,6 @@ namespace JSONAPI.Core
         /// The key that will be used to represent this property in JSON API documents
         /// </summary>
         public string JsonKey { get; private set; }
-
-        /// <summary>
-        /// Whether this property should be ignored by default for serialization.
-        /// </summary>
-        public bool IgnoreByDefault { get; private set; }
     }
 
     /// <summary>
@@ -36,8 +30,8 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class ResourceTypeAttribute : ResourceTypeField
     {
-        internal ResourceTypeAttribute(PropertyInfo property, string jsonKey, bool ignoreByDefault)
-            : base(property, jsonKey, ignoreByDefault)
+        internal ResourceTypeAttribute(PropertyInfo property, string jsonKey)
+            : base(property, jsonKey)
         {
         }
     }
@@ -47,9 +41,9 @@ namespace JSONAPI.Core
     /// </summary>
     public abstract class ResourceTypeRelationship : ResourceTypeField
     {
-        internal ResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ResourceTypeRelationship(PropertyInfo property, string jsonKey, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate, bool isToMany)
-            : base(property, jsonKey, ignoreByDefault)
+            : base(property, jsonKey)
         {
             RelatedType = relatedType;
             SelfLinkTemplate = selfLinkTemplate;
@@ -87,9 +81,9 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class ToManyResourceTypeRelationship : ResourceTypeRelationship
     {
-        internal ToManyResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ToManyResourceTypeRelationship(PropertyInfo property, string jsonKey, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate)
-            : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true)
+            : base(property, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true)
         {
         }
     }
@@ -99,9 +93,9 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class ToOneResourceTypeRelationship : ResourceTypeRelationship
     {
-        internal ToOneResourceTypeRelationship(PropertyInfo property, string jsonKey, bool ignoreByDefault, Type relatedType,
+        internal ToOneResourceTypeRelationship(PropertyInfo property, string jsonKey, Type relatedType,
             string selfLinkTemplate, string relatedResourceLinkTemplate)
-            : base(property, jsonKey, ignoreByDefault, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, false)
+            : base(property, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, false)
         {
         }
     }

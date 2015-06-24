@@ -88,8 +88,6 @@ namespace JSONAPI.ActionFilters
 
                 Expression expr = null;
 
-                if (resourceTypeField.IgnoreByDefault) continue;
-
                 // See if it is a field property
                 var fieldModelProperty = resourceTypeField as ResourceTypeAttribute;
                 if (fieldModelProperty != null)

@@ -28,7 +28,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof (Country).GetProperty("Cities"),
-                "cities", false, typeof (City), null, null);
+                "cities", typeof (City), null, null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
@@ -49,7 +49,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), null, null);
+                "cities", typeof(City), null, null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
@@ -70,7 +70,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), "foo/{1}/bar", null);
+                "cities", typeof(City), "foo/{1}/bar", null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
             var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
@@ -90,7 +90,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), "foo/{1}/bar", null);
+                "cities", typeof(City), "foo/{1}/bar", null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
             var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
@@ -110,7 +110,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), null, null);
+                "cities", typeof(City), null, null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
@@ -131,7 +131,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), null, null);
+                "cities", typeof(City), null, null);
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.ResourceTypeName).Returns("countries");
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
@@ -152,7 +152,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), null, "bar/{1}/qux");
+                "cities", typeof(City), null, "bar/{1}/qux");
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
             var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
@@ -172,7 +172,7 @@ namespace JSONAPI.Tests.Payload
             // Arrange
             var relationshipOwner = new Country { Id = "45" };
             var relationshipProperty = new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"),
-                "cities", false, typeof(City), null, "bar/{1}/qux");
+                "cities", typeof(City), null, "bar/{1}/qux");
             var mockTypeRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             mockTypeRegistration.Setup(r => r.GetIdForResource(relationshipOwner)).Returns("45");
             var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);

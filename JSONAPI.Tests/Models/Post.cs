@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JSONAPI.Attributes;
+using Newtonsoft.Json;
 
 namespace JSONAPI.Tests.Models
 {
@@ -7,6 +8,9 @@ namespace JSONAPI.Tests.Models
     {
         public int Id { get; set; }
         public string Title { get; set; }
+
+        [JsonIgnore]
+        public string AuthorId { get; set; }
 
         [RelationshipLinkTemplate("/posts/{1}/relationships/comments")]
         [RelatedResourceLinkTemplate("/posts/{1}/comments")]

@@ -104,13 +104,13 @@ namespace JSONAPI.Tests.Payload.Builders
 
 
             // Country registration
-            var countryName = new ResourceTypeAttribute(typeof(Country).GetProperty("Name"), "name", false);
+            var countryName = new ResourceTypeAttribute(typeof(Country).GetProperty("Name"), "name");
             var countryCities =
-                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"), "cities", false, typeof(City), null, null);
+                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Cities"), "cities", typeof(City), null, null);
             var countryProvinces =
-                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Provinces"), "provinces", false, typeof(Province), null, null);
+                new ToManyResourceTypeRelationship(typeof(Country).GetProperty("Provinces"), "provinces", typeof(Province), null, null);
             var countryContinent =
-                new ToOneResourceTypeRelationship(typeof(Country).GetProperty("Continent"), "continent", false, typeof(Continent), null, null);
+                new ToOneResourceTypeRelationship(typeof(Country).GetProperty("Continent"), "continent", typeof(Continent), null, null);
             var countryRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             countryRegistration.Setup(m => m.GetIdForResource(It.IsAny<Country>())).Returns((Country c) => country.Id);
             countryRegistration.Setup(m => m.ResourceTypeName).Returns("countries");
@@ -121,7 +121,7 @@ namespace JSONAPI.Tests.Payload.Builders
 
 
             // City registration
-            var cityNameProperty = new ResourceTypeAttribute(typeof(City).GetProperty("Name"), "name", false);
+            var cityNameProperty = new ResourceTypeAttribute(typeof(City).GetProperty("Name"), "name");
             var cityRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             cityRegistration.Setup(m => m.ResourceTypeName).Returns("cities");
             cityRegistration.Setup(m => m.GetIdForResource(It.IsAny<City>())).Returns((City c) => c.Id);
@@ -130,8 +130,8 @@ namespace JSONAPI.Tests.Payload.Builders
 
 
             // Province registration
-            var provinceName = new ResourceTypeAttribute(typeof(Province).GetProperty("Name"), "name", false);
-            var provinceCapital = new ToOneResourceTypeRelationship(typeof(Province).GetProperty("Capital"), "capital", false, typeof(City), null, null);
+            var provinceName = new ResourceTypeAttribute(typeof(Province).GetProperty("Name"), "name");
+            var provinceCapital = new ToOneResourceTypeRelationship(typeof(Province).GetProperty("Capital"), "capital", typeof(City), null, null);
             var provinceRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             provinceRegistration.Setup(m => m.ResourceTypeName).Returns("provinces");
             provinceRegistration.Setup(m => m.GetIdForResource(It.IsAny<Province>())).Returns((Province c) => c.Id);
@@ -142,9 +142,9 @@ namespace JSONAPI.Tests.Payload.Builders
 
 
             // Continent registration
-            var continentName = new ResourceTypeAttribute(typeof(Continent).GetProperty("Name"), "name", false);
+            var continentName = new ResourceTypeAttribute(typeof(Continent).GetProperty("Name"), "name");
             var continentCountries =
-                new ToManyResourceTypeRelationship(typeof(Continent).GetProperty("Countries"), "countries", false, typeof(Country), null, null);
+                new ToManyResourceTypeRelationship(typeof(Continent).GetProperty("Countries"), "countries", typeof(Country), null, null);
             var continentRegistration = new Mock<IResourceTypeRegistration>(MockBehavior.Strict);
             continentRegistration.Setup(m => m.ResourceTypeName).Returns("continents");
             continentRegistration.Setup(m => m.GetIdForResource(It.IsAny<Continent>())).Returns((Continent c) => c.Id);
