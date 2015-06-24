@@ -13,8 +13,8 @@ namespace JSONAPI.Payload.Builders
         /// <summary>
         /// Builds a payload object for the given query
         /// </summary>
-        /// <param name="query"></param>
-        /// <param name="request"></param>
+        /// <param name="query">The query to materialize to build the response payload</param>
+        /// <param name="request">The request containing parameters to determine how to sort/filter/paginate the query</param>
         /// <param name="cancellationToken"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>

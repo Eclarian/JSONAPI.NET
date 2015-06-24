@@ -17,6 +17,7 @@ namespace JSONAPI.Core
     {
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly ILinkConventions _linkConventions;
+        private Func<IResourceCollectionPayloadBuilder, IQueryableResourceCollectionPayloadBuilder> _queryablePayloadBuilderFactory;
 
         /// <summary>
         /// Creates a new configuration
@@ -27,6 +28,24 @@ namespace JSONAPI.Core
 
             _resourceTypeRegistry = resourceTypeRegistry;
             _linkConventions = linkConventions;
+            _queryablePayloadBuilderFactory = resourceCollectionPayloadBuilder =>
+                new DefaultQueryablePayloadBuilderConfiguration().GetBuilder(resourceCollectionPayloadBuilder, _resourceTypeRegistry);
+        }
+
+        /// <summary>
+        /// Allows configuring the default queryable payload builder
+        /// </summary>
+        /// <param name="configurationAction">Provides access to a fluent DefaultQueryablePayloadBuilderConfiguration object</param>
+        /// <returns>The same configuration object the method was called on.</returns>
+        public JsonApiConfiguration UsingDefaultQueryablePayloadBuilder(Action<DefaultQueryablePayloadBuilderConfiguration> configurationAction)
+        {
+            _queryablePayloadBuilderFactory = resourceCollectionPayloadBuilder =>
+            {
+                var configuration = new DefaultQueryablePayloadBuilderConfiguration();
+                configurationAction(configuration);
+                return configuration.GetBuilder(resourceCollectionPayloadBuilder, _resourceTypeRegistry);
+            };
+            return this;
         }
 
         /// <summary>
@@ -51,8 +70,9 @@ namespace JSONAPI.Core
 
             var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, _linkConventions);
             var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry);
+            var queryableResourcePayloadBuilder = _queryablePayloadBuilderFactory(resourceCollectionPayloadBuilder);
             var errorPayloadBuilder = new ErrorPayloadBuilder();
-            var fallbackPayloadBuilder = new FallbackPayloadBuilder(_resourceTypeRegistry, errorPayloadBuilder, singleResourcePayloadBuilder, resourceCollectionPayloadBuilder);
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder, queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder);
             httpConfig.Filters.Add(new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder, errorPayloadSerializer));
 
             httpConfig.Services.Replace(typeof(IHttpControllerSelector),

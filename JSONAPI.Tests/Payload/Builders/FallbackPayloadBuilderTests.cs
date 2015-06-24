@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JSONAPI.Core;
@@ -19,32 +21,122 @@ namespace JSONAPI.Tests.Payload.Builders
 
         class Fruit
         {
-            
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+        }
+
+        //[TestMethod]
+        //public void Creates_error_payload_for_unknown_types()
+        //{
+        //    // Arrange
+        //    var objectContent = new Fruit();
+
+        //    var mockPayload = new Mock<IErrorPayload>(MockBehavior.Strict);
+
+        //    var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
+        //    mockErrorPayloadBuilder
+        //        .Setup(b => b.BuildFromException(It.IsAny<TypeRegistrationNotFoundException>()))
+        //        .Returns(mockPayload.Object);
+
+        //    var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
+        //    var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+
+        //    // Act
+        //    var fallbackPayloadBuilder = new FallbackPayloadBuilder(mockResourceTypeRegistry.Object, mockErrorPayloadBuilder.Object,
+        //        singleResourcePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+        //    var resultPayload = fallbackPayloadBuilder.BuildPayload(objectContent, null);
+
+        //    // Assert
+        //    resultPayload.Should().BeSameAs(mockPayload.Object);
+        //}
+
+        [TestMethod]
+        public async Task Creates_single_resource_payload_for_registered_non_collection_types()
+        {
+            // Arrange
+            var objectContent = new Fruit { Id = "984", Name = "Kiwi" };
+
+            var mockPayload = new Mock<ISingleResourcePayload>(MockBehavior.Strict);
+
+            var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
+            singleResourcePayloadBuilder.Setup(b => b.BuildPayload(objectContent)).Returns(mockPayload.Object);
+
+            var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+
+            var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            // Act
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+            var resultPayload = await fallbackPayloadBuilder.BuildPayload(objectContent, null, cancellationTokenSource.Token);
+
+            // Assert
+            resultPayload.Should().BeSameAs(mockPayload.Object);
         }
 
         [TestMethod]
-        public void Creates_error_payload_for_unknown_types()
+        public async Task Creates_resource_collection_payload_for_queryables()
         {
             // Arrange
-            var objectContent = new Fruit();
+            var items = new[]
+            {
+                new Fruit {Id = "43", Name = "Strawberry"},
+                new Fruit {Id = "43", Name = "Grape"}
+            }.AsQueryable();
 
-            var mockResourceTypeRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
-            mockResourceTypeRegistry.Setup(m => m.TypeIsRegistered(typeof (Fruit))).Returns(false);
-
-            var mockPayload = new Mock<IErrorPayload>(MockBehavior.Strict);
-
-            var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-            mockErrorPayloadBuilder
-                .Setup(b => b.BuildFromException(It.IsAny<TypeRegistrationNotFoundException>()))
-                .Returns(mockPayload.Object);
+            var mockPayload = new Mock<IResourceCollectionPayload>(MockBehavior.Strict);
 
             var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
+
+            var request = new HttpRequestMessage();
+            
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+            mockQueryablePayloadBuilder
+                .Setup(b => b.BuildPayload(items, request, cancellationTokenSource.Token))
+                .Returns(() => Task.FromResult(mockPayload.Object));
+
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
 
             // Act
-            var fallbackPayloadBuilder = new FallbackPayloadBuilder(mockResourceTypeRegistry.Object, mockErrorPayloadBuilder.Object,
-                singleResourcePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
-            var resultPayload = fallbackPayloadBuilder.BuildPayload(objectContent, null);
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+            var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, request, cancellationTokenSource.Token);
+
+            // Assert
+            resultPayload.Should().BeSameAs(mockPayload.Object);
+        }
+
+        [TestMethod]
+        public async Task Creates_resource_collection_payload_for_non_queryable_enumerables()
+        {
+            // Arrange
+            var items = new[]
+            {
+                new Fruit {Id = "43", Name = "Strawberry"},
+                new Fruit {Id = "43", Name = "Grape"}
+            };
+
+            var mockPayload = new Mock<IResourceCollectionPayload>(MockBehavior.Strict);
+
+            var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+            var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
+            mockResourceCollectionPayloadBuilder
+                .Setup(b => b.BuildPayload(items))
+                .Returns(() => (mockPayload.Object));
+
+            // Act
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+            var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, null, cancellationTokenSource.Token);
 
             // Assert
             resultPayload.Should().BeSameAs(mockPayload.Object);

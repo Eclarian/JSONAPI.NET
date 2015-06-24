@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using FluentAssertions;
@@ -146,7 +147,8 @@ namespace JSONAPI.Tests.ActionFilters
 
             var mockResult = new Mock<IJsonApiPayload>(MockBehavior.Strict);
             var mockFallbackPayloadBuilder = new Mock<IFallbackPayloadBuilder>(MockBehavior.Strict);
-            mockFallbackPayloadBuilder.Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>())).Returns(mockResult.Object);
+            mockFallbackPayloadBuilder.Setup(b => b.BuildPayload(payload, It.IsAny<HttpRequestMessage>(), cancellationTokenSource.Token))
+                .Returns(Task.FromResult(mockResult.Object));
 
             var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
             var mockErrorPayloadSerializer = new Mock<IErrorPayloadSerializer>(MockBehavior.Strict);

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using JSONAPI.Core;
 
 namespace JSONAPI.Payload.Builders
@@ -11,57 +14,69 @@ namespace JSONAPI.Payload.Builders
     /// </summary>
     public class FallbackPayloadBuilder : IFallbackPayloadBuilder
     {
-        private readonly IResourceTypeRegistry _resourceTypeRegistry;
-        private readonly IErrorPayloadBuilder _errorPayloadBuilder;
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
+        private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly IResourceCollectionPayloadBuilder _resourceCollectionPayloadBuilder;
+        private readonly Lazy<MethodInfo> _openBuildPayloadFromQueryableMethod;
+        private readonly Lazy<MethodInfo> _openBuildPayloadFromEnumerableMethod;
 
         /// <summary>
         /// Creates a new FallbackPayloadBuilder
         /// </summary>
-        /// <param name="resourceTypeRegistry"></param>
-        /// <param name="errorPayloadBuilder"></param>
         /// <param name="singleResourcePayloadBuilder"></param>
+        /// <param name="queryableResourceCollectionPayloadBuilder"></param>
         /// <param name="resourceCollectionPayloadBuilder"></param>
-        public FallbackPayloadBuilder(IResourceTypeRegistry resourceTypeRegistry, IErrorPayloadBuilder errorPayloadBuilder,
-            ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+        public FallbackPayloadBuilder(ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+            IQueryableResourceCollectionPayloadBuilder queryableResourceCollectionPayloadBuilder,
             IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder)
         {
-            _resourceTypeRegistry = resourceTypeRegistry;
-            _errorPayloadBuilder = errorPayloadBuilder;
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
+            _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
             _resourceCollectionPayloadBuilder = resourceCollectionPayloadBuilder;
+
+            _openBuildPayloadFromQueryableMethod =
+                new Lazy<MethodInfo>(
+                    () => _queryableResourceCollectionPayloadBuilder.GetType()
+                        .GetMethod("BuildPayload", BindingFlags.Instance | BindingFlags.Public));
+
+            _openBuildPayloadFromEnumerableMethod =
+                new Lazy<MethodInfo>(
+                    () => _resourceCollectionPayloadBuilder.GetType()
+                        .GetMethod("BuildPayload", BindingFlags.Instance | BindingFlags.Public));
         }
 
-        public IJsonApiPayload BuildPayload(object obj, HttpRequestMessage requestMessage)
+        public async Task<IJsonApiPayload> BuildPayload(object obj, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             var type = obj.GetType();
+
+            var queryableInterfaces = type.GetInterfaces();
+            var queryableInterface = queryableInterfaces.FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryable<>));
+            if (queryableInterface != null)
+            {
+                var queryableElementType = queryableInterface.GenericTypeArguments[0];
+                var buildPayloadMethod = _openBuildPayloadFromQueryableMethod.Value.MakeGenericMethod(queryableElementType);
+
+                dynamic materializedQueryTask = buildPayloadMethod.Invoke(_queryableResourceCollectionPayloadBuilder,
+                    new[] { obj, requestMessage, cancellationToken });
+
+                return await materializedQueryTask;
+            }
+
             var isCollection = false;
             var enumerableElementType = GetEnumerableElementType(type);
             if (enumerableElementType != null)
             {
-                type = enumerableElementType;
                 isCollection = true;
-            }
-
-            try
-            {
-                if (!_resourceTypeRegistry.TypeIsRegistered(type))
-                    throw new TypeRegistrationNotFoundException(type);
-            }
-            catch (TypeRegistrationNotFoundException ex)
-            {
-                return _errorPayloadBuilder.BuildFromException(ex);
             }
 
             if (isCollection)
             {
-                throw new NotImplementedException();
+                var buildPayloadMethod = _openBuildPayloadFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
+                return (dynamic)buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] { obj, new string[] { } });
             }
-            else
-            {
-                return _singleResourcePayloadBuilder.BuildPayload(obj);
-            }
+
+            // Single resource object
+            return _singleResourcePayloadBuilder.BuildPayload(obj);
         }
 
         private static Type GetEnumerableElementType(Type collectionType)

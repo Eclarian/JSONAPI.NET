@@ -1,4 +1,6 @@
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSONAPI.Payload.Builders
 {
@@ -11,7 +13,9 @@ namespace JSONAPI.Payload.Builders
         /// Builds a JSON API payload based on the given object
         /// </summary>
         /// <param name="obj"></param>
+        /// <param name="requestMessage"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        IJsonApiPayload BuildPayload(object obj, HttpRequestMessage requestMessage);
+        Task<IJsonApiPayload> BuildPayload(object obj, HttpRequestMessage requestMessage, CancellationToken cancellationToken);
     }
 }

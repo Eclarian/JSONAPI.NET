@@ -8,7 +8,6 @@ namespace JSONAPI.Core
     /// </summary>
     public sealed class DefaultQueryablePayloadBuilderConfiguration
     {
-        private readonly IResourceCollectionPayloadBuilder _resourceCollectionPayloadBuilder;
         private bool _enableFiltering;
         private bool _enableSorting;
         private bool _enablePagination;
@@ -17,9 +16,8 @@ namespace JSONAPI.Core
         private IQueryablePaginationTransformer _paginationTransformer;
         private IQueryableEnumerationTransformer _enumerationTransformer;
 
-        internal DefaultQueryablePayloadBuilderConfiguration(IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder)
+        internal DefaultQueryablePayloadBuilderConfiguration()
         {
-            _resourceCollectionPayloadBuilder = resourceCollectionPayloadBuilder;
             _enableFiltering = true;
             _enableSorting = true;
             _enablePagination = true;
@@ -99,7 +97,8 @@ namespace JSONAPI.Core
             return this;
         }
 
-        internal DefaultQueryableResourceCollectionPayloadBuilder GetBuilder(IResourceTypeRegistry resourceTypeRegistry)
+        internal DefaultQueryableResourceCollectionPayloadBuilder GetBuilder(IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder,
+            IResourceTypeRegistry resourceTypeRegistry)
         {
             IQueryableFilteringTransformer filteringTransformer = null;
             if (_enableFiltering)
@@ -117,7 +116,7 @@ namespace JSONAPI.Core
             IQueryableEnumerationTransformer enumerationTransformer =
                 _enumerationTransformer ?? new SynchronousEnumerationTransformer();
 
-            return new DefaultQueryableResourceCollectionPayloadBuilder(_resourceCollectionPayloadBuilder,
+            return new DefaultQueryableResourceCollectionPayloadBuilder(resourceCollectionPayloadBuilder,
                 enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
         }
     }
