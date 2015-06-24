@@ -16,6 +16,7 @@ namespace JSONAPI.Payload.Builders
         /// <param name="requestMessage"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        /// <exception cref="JsonApiException">Thrown when an error occurs when building the payload</exception>
         Task<IJsonApiPayload> BuildPayload(object obj, HttpRequestMessage requestMessage, CancellationToken cancellationToken);
     }
 }

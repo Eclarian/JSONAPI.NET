@@ -10,7 +10,11 @@ namespace JSONAPI.Payload.Builders
     {
         public IErrorPayload BuildFromException(Exception exception)
         {
-            var error = BuildErrorForException(exception);
+            var jsonApiException = exception as JsonApiException;
+            var error = jsonApiException != null
+                ? jsonApiException.Error
+                : BuildErrorForException(exception);
+
             var topLevelMetadata = GetTopLevelMetadata();
             return new ErrorPayload(new [] { error }, topLevelMetadata);
         }

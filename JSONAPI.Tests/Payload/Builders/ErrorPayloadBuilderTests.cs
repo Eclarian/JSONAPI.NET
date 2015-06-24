@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Net;
 using FluentAssertions;
+using JSONAPI.Payload;
 using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Tests.Payload.Builders
@@ -131,6 +133,30 @@ namespace JSONAPI.Tests.Payload.Builders
             var inner = (JObject)middle["innerException"];
             ((string)inner["exceptionMessage"]).Should().Be("This is the inner exception!");
             ((string)inner["stackTrace"]).Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Builds_payload_from_JsonApiException()
+        {
+            // Arrange
+            var mockError = new Mock<IError>(MockBehavior.Strict);
+            JsonApiException theException;
+            try
+            {
+                throw new JsonApiException(mockError.Object);
+            }
+            catch (JsonApiException ex)
+            {
+                theException = ex;
+            }
+
+            // Act
+            var errorPayloadBuilder = new ErrorPayloadBuilder();
+            var payload = errorPayloadBuilder.BuildFromException(theException);
+
+            // Assert
+            payload.Errors.Length.Should().Be(1);
+            payload.Errors.First().Should().Be(mockError.Object);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -47,9 +48,16 @@ namespace JSONAPI.ActionFilters
                 {
                     // These payload types should be passed through; they are already ready to be serialized.
                     if (objectContent.Value is ISingleResourcePayload ||
-                        objectContent.Value is IResourceCollectionPayload ||
-                        objectContent.Value is IErrorPayload)
+                        objectContent.Value is IResourceCollectionPayload)
                         return;
+
+                    var errorPayload = objectContent.Value as IErrorPayload;
+                    if (errorPayload != null)
+                    {
+                        actionExecutedContext.Response.StatusCode =
+                            errorPayload.Errors.First().Status;
+                        return;
+                    }
 
                     var payloadValue = objectContent.Value;
                     if (actionExecutedContext.Exception != null)
@@ -60,12 +68,23 @@ namespace JSONAPI.ActionFilters
                     {
                         try
                         {
-                            payloadValue = await _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request, cancellationToken);
+                            payloadValue =
+                                await _fallbackPayloadBuilder.BuildPayload(payloadValue, actionExecutedContext.Request, cancellationToken);
+                        }
+                        catch (JsonApiException ex)
+                        {
+                            payloadValue = _errorPayloadBuilder.BuildFromException(ex);
                         }
                         catch (Exception ex)
                         {
                             payloadValue = _errorPayloadBuilder.BuildFromException(ex);
                         }
+                    }
+
+                    errorPayload = payloadValue as IErrorPayload;
+                    if (payloadValue is IErrorPayload)
+                    {
+                        actionExecutedContext.Response.StatusCode = errorPayload.Errors.First().Status;
                     }
 
                     actionExecutedContext.Response.Content = new ObjectContent(payloadValue.GetType(), payloadValue, objectContent.Formatter);

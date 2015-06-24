@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Web.Http;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.ActionFilters
 {
@@ -44,16 +43,16 @@ namespace JSONAPI.ActionFilters
                 {
                     hasPageNumberParam = true;
                     if (!int.TryParse(kvp.Value, out pageNumber))
-                        throw new QueryableTransformException(
-                            String.Format("{0} must be a positive integer.", _pageNumberQueryParam));
+                        throw JsonApiException.CreateForParameterError("Invalid page number",
+                            "Page number must be a positive integer.", _pageNumberQueryParam);
 
                 }
                 else if (kvp.Key == _pageSizeQueryParam)
                 {
                     hasPageSizeParam = true;
                     if (!int.TryParse(kvp.Value, out pageSize))
-                        throw new QueryableTransformException(
-                            String.Format("{0} must be a positive integer.", _pageSizeQueryParam));
+                        throw JsonApiException.CreateForParameterError("Invalid page size",
+                            "Page size must be a positive integer.", _pageSizeQueryParam);
                 }
             }
 
@@ -66,18 +65,23 @@ namespace JSONAPI.ActionFilters
                 };
             }
 
-            if ((hasPageNumberParam && !hasPageSizeParam) || (!hasPageNumberParam && hasPageSizeParam))
-                throw new QueryableTransformException(
-                    String.Format("In order for paging to work properly, if either {0} or {1} is set, both must be.",
-                        _pageNumberQueryParam, _pageSizeQueryParam));
+            if ((hasPageNumberParam && !hasPageSizeParam))
+                throw JsonApiException.CreateForParameterError("Page size missing",
+                    string.Format("In order for paging to work properly, if either {0} or {1} is set, both must be.",
+                        _pageNumberQueryParam, _pageSizeQueryParam), _pageNumberQueryParam);
+
+            if ((!hasPageNumberParam && hasPageSizeParam))
+                throw JsonApiException.CreateForParameterError("Page number missing",
+                    string.Format("In order for paging to work properly, if either {0} or {1} is set, both must be.",
+                        _pageNumberQueryParam, _pageSizeQueryParam), _pageSizeQueryParam);
 
             if (pageNumber < 0)
-                throw new QueryableTransformException(
-                    String.Format("{0} must be not be negative.", _pageNumberQueryParam));
+                throw JsonApiException.CreateForParameterError("Page number out of bounds",
+                    "Page number must not be negative.", _pageNumberQueryParam);
 
-            if (pageSize < 0)
-                throw new QueryableTransformException(
-                    String.Format("{0} must be not be negative.", _pageSizeQueryParam));
+            if (pageSize <= 0)
+                throw JsonApiException.CreateForParameterError("Page size out of bounds",
+                    "Page size must be greater than or equal to 1.", _pageSizeQueryParam);
 
             if (_maxPageSize != null && pageSize > _maxPageSize.Value)
                 pageSize = _maxPageSize.Value;

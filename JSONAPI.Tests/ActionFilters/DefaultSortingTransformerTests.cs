@@ -5,6 +5,7 @@ using System.Net.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters
@@ -70,7 +71,7 @@ namespace JSONAPI.Tests.ActionFilters
                 // ReSharper disable once UnusedVariable
                 var result = GetTransformer().Sort(_fixturesQuery, request).ToArray();
             };
-            action.ShouldThrow<QueryableTransformException>().Which.Message.Should().Be(expectedMessage);
+            action.ShouldThrow<JsonApiException>().Which.Error.Detail.Should().Be(expectedMessage);
         }
 
         [TestMethod]
@@ -116,13 +117,13 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Returns_400_if_property_name_is_missing()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B", "The property name is missing.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_property_name_is_whitespace()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B ", "The property name is missing.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B ", "One of the sort expressions is empty.");
         }
 
         [TestMethod]

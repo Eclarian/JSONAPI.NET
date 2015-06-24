@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -26,31 +27,6 @@ namespace JSONAPI.Tests.Payload.Builders
             public string Name { get; set; }
         }
 
-        //[TestMethod]
-        //public void Creates_error_payload_for_unknown_types()
-        //{
-        //    // Arrange
-        //    var objectContent = new Fruit();
-
-        //    var mockPayload = new Mock<IErrorPayload>(MockBehavior.Strict);
-
-        //    var mockErrorPayloadBuilder = new Mock<IErrorPayloadBuilder>(MockBehavior.Strict);
-        //    mockErrorPayloadBuilder
-        //        .Setup(b => b.BuildFromException(It.IsAny<TypeRegistrationNotFoundException>()))
-        //        .Returns(mockPayload.Object);
-
-        //    var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
-        //    var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
-
-        //    // Act
-        //    var fallbackPayloadBuilder = new FallbackPayloadBuilder(mockResourceTypeRegistry.Object, mockErrorPayloadBuilder.Object,
-        //        singleResourcePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
-        //    var resultPayload = fallbackPayloadBuilder.BuildPayload(objectContent, null);
-
-        //    // Assert
-        //    resultPayload.Should().BeSameAs(mockPayload.Object);
-        //}
-
         [TestMethod]
         public async Task Creates_single_resource_payload_for_registered_non_collection_types()
         {
@@ -63,7 +39,6 @@ namespace JSONAPI.Tests.Payload.Builders
             singleResourcePayloadBuilder.Setup(b => b.BuildPayload(objectContent)).Returns(mockPayload.Object);
 
             var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
-
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
 
             var cancellationTokenSource = new CancellationTokenSource();

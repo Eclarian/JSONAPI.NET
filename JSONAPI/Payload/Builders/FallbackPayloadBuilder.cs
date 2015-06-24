@@ -45,19 +45,23 @@ namespace JSONAPI.Payload.Builders
                         .GetMethod("BuildPayload", BindingFlags.Instance | BindingFlags.Public));
         }
 
-        public async Task<IJsonApiPayload> BuildPayload(object obj, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
+        public async Task<IJsonApiPayload> BuildPayload(object obj, HttpRequestMessage requestMessage,
+            CancellationToken cancellationToken)
         {
             var type = obj.GetType();
 
             var queryableInterfaces = type.GetInterfaces();
-            var queryableInterface = queryableInterfaces.FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryable<>));
+            var queryableInterface =
+                queryableInterfaces.FirstOrDefault(
+                    i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof (IQueryable<>));
             if (queryableInterface != null)
             {
                 var queryableElementType = queryableInterface.GenericTypeArguments[0];
-                var buildPayloadMethod = _openBuildPayloadFromQueryableMethod.Value.MakeGenericMethod(queryableElementType);
+                var buildPayloadMethod =
+                    _openBuildPayloadFromQueryableMethod.Value.MakeGenericMethod(queryableElementType);
 
                 dynamic materializedQueryTask = buildPayloadMethod.Invoke(_queryableResourceCollectionPayloadBuilder,
-                    new[] { obj, requestMessage, cancellationToken });
+                    new[] {obj, requestMessage, cancellationToken});
 
                 return await materializedQueryTask;
             }
@@ -71,8 +75,10 @@ namespace JSONAPI.Payload.Builders
 
             if (isCollection)
             {
-                var buildPayloadMethod = _openBuildPayloadFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
-                return (dynamic)buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] { obj, new string[] { } });
+                var buildPayloadMethod =
+                    _openBuildPayloadFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
+                return
+                    (dynamic) buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] {obj, new string[] {}});
             }
 
             // Single resource object

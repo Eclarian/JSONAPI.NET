@@ -74,8 +74,6 @@
     <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
     <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableSortingTransformer.cs" />
-    <Compile Include="ActionFilters\JsonApiQueryableAttribute.cs" />
-    <Compile Include="ActionFilters\QueryableTransformException.cs" />
     <Compile Include="ActionFilters\DefaultSortingTransformer.cs" />
     <Compile Include="ActionFilters\SynchronousEnumerationTransformer.cs" />
     <Compile Include="Attributes\RelatedResourceLinkTemplate.cs" />
@@ -102,6 +100,7 @@
     <Compile Include="Payload\Builders\FallbackPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\IFallbackPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\IResourceCollectionPayloadBuilder.cs" />
+    <Compile Include="Payload\Builders\JsonApiException.cs" />
     <Compile Include="Payload\Builders\RegistryDrivenPayloadBuilder.cs" />
     <Compile Include="Payload\Builders\RegistryDrivenResourceCollectionPayloadBuilder.cs" />
     <Compile Include="Payload\DefaultLinkConventions.cs" />
