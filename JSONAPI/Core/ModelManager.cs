@@ -278,8 +278,7 @@ namespace JSONAPI.Core
 
         private static string FormatPropertyName(string propertyName)
         {
-            string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
-            return result;
+            return propertyName.Dasherize();
         }
 
         public bool IsSerializedAsMany(Type type)
